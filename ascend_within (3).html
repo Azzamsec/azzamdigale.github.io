@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ascend Within — Personal Development</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1208;
+  --paper:#faf7f2;
+  --cream:#f0ebe0;
+  --warm:#e8dfd0;
+  --gold:#c4892a;
+  --gold-light:#e8b86d;
+  --rust:#c4522a;
+  --muted:#7a6a54;
+  --dark:#120d06;
+  --white:#ffffff;
+  --shadow:0 6px 32px rgba(26,18,8,.12);
+  --shadow-lg:0 16px 56px rgba(26,18,8,.18);
+  --r:6px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Jost',sans-serif;background:var(--paper);color:var(--ink);line-height:1.75;font-size:16px;font-weight:300}
+
+/* ═══ SCROLLBAR ═══ */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--cream)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+
+/* ═══ NAV ═══ */
+#navbar{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 5vw;
+  background:transparent;
+  transition:background .4s,padding .4s,box-shadow .4s;
+}
+#navbar.scrolled{
+  background:rgba(18,13,6,.96);
+  padding:.75rem 5vw;
+  box-shadow:0 2px 20px rgba(0,0,0,.3);
+  backdrop-filter:blur(12px);
+}
+.nav-logo img{height:42px;width:auto;display:block}
+.nav-links{display:flex;align-items:center;gap:2.5rem;list-style:none}
+.nav-links a{
+  color:rgba(255,255,255,.85);text-decoration:none;
+  font-size:.82rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  transition:color .2s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-3px;left:0;right:0;height:1px;
+  background:var(--gold-light);transform:scaleX(0);transform-origin:left;
+  transition:transform .3s;
+}
+.nav-links a:hover{color:var(--gold-light)}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-cta{
+  background:var(--gold);color:white!important;
+  padding:.45rem 1.3rem;border-radius:100px;
+  font-weight:500!important;letter-spacing:.08em!important;
+  transition:background .2s,transform .15s!important;
+}
+.nav-cta:hover{background:var(--rust)!important;transform:translateY(-1px)}
+.nav-cta::after{display:none!important}
+.burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.burger span{width:26px;height:2px;background:white;border-radius:2px;transition:.3s}
+.mobile-nav{
+  display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(18,13,6,.97);z-index:999;
+  flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;
+}
+.mobile-nav.open{display:flex}
+.mobile-nav a{
+  color:white;text-decoration:none;font-family:'Cormorant Garamond',serif;
+  font-size:2.4rem;font-weight:300;letter-spacing:.06em;
+  transition:color .2s;
+}
+.mobile-nav a:hover{color:var(--gold-light)}
+.mobile-close{
+  position:absolute;top:1.5rem;right:2rem;
+  color:white;font-size:2rem;cursor:pointer;line-height:1;
+}
+
+/* ═══ HERO ═══ */
+#hero{
+  position:relative;min-height:100vh;
+  display:flex;align-items:center;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+}
+.hero-bg img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(18,13,6,.72) 40%,rgba(18,13,6,.3) 100%);
+}
+.hero-content{
+  position:relative;z-index:2;
+  max-width:680px;padding:0 5vw;
+  animation:fadeUp .9s ease both;
+}
+.hero-kicker{
+  display:inline-block;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--gold-light);font-weight:500;margin-bottom:1.4rem;
+  border-left:2px solid var(--gold);padding-left:.8rem;
+}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.8rem,6vw,5rem);line-height:1.08;
+  font-weight:600;color:white;margin-bottom:1.6rem;
+}
+.hero-title em{font-style:italic;color:var(--gold-light)}
+.hero-sub{color:rgba(255,255,255,.78);font-size:1.1rem;max-width:50ch;margin-bottom:2.4rem;font-weight:300}
+.btn-primary{
+  display:inline-block;padding:.85rem 2.4rem;
+  background:var(--gold);color:white;border-radius:100px;
+  text-decoration:none;font-weight:500;font-size:.9rem;letter-spacing:.06em;
+  transition:background .2s,transform .15s,box-shadow .2s;
+  box-shadow:0 4px 20px rgba(196,137,42,.4);
+}
+.btn-primary:hover{background:var(--rust);transform:translateY(-3px);box-shadow:0 8px 28px rgba(196,82,42,.4)}
+.btn-ghost{
+  display:inline-block;padding:.85rem 2.4rem;
+  background:transparent;color:white;border-radius:100px;border:1.5px solid rgba(255,255,255,.45);
+  text-decoration:none;font-weight:400;font-size:.9rem;letter-spacing:.06em;
+  margin-left:1rem;transition:border-color .2s,background .2s,transform .15s;
+}
+.btn-ghost:hover{border-color:var(--gold-light);background:rgba(232,184,109,.12);transform:translateY(-3px)}
+.hero-scroll{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  color:rgba(255,255,255,.5);font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;
+  cursor:pointer;
+}
+.hero-scroll-line{
+  width:1px;height:48px;background:linear-gradient(to bottom,rgba(255,255,255,.4),transparent);
+  animation:scrollPulse 2s infinite;
+}
+
+/* ═══ SECTION SHARED ═══ */
+section{padding:6rem 5vw}
+.sec-kicker{
+  font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--rust);font-weight:500;margin-bottom:.7rem;display:block;
+}
+.sec-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,3.5vw,3rem);line-height:1.15;
+  font-weight:600;color:var(--ink);margin-bottom:1rem;
+}
+.sec-title em{font-style:italic;color:var(--gold)}
+.gold-bar{width:44px;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;margin-bottom:1.8rem}
+.text-center{text-align:center}
+.text-center .gold-bar{margin-left:auto;margin-right:auto}
+
+/* ═══ FEATURED QUOTE ═══ */
+#quote{
+  background:var(--dark);padding:5rem 5vw;
+  display:flex;align-items:center;justify-content:center;
+}
+.quote-inner{max-width:820px;text-align:center}
+.quote-mark{
+  font-family:'Cormorant Garamond',serif;
+  font-size:8rem;line-height:.6;color:var(--gold);opacity:.35;
+  margin-bottom:.5rem;display:block;
+}
+.quote-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.6rem,3vw,2.4rem);
+  color:white;font-style:italic;line-height:1.45;
+  font-weight:300;
+}
+.quote-author{
+  margin-top:1.8rem;font-size:.82rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold-light);font-weight:500;
+}
+
+/* ═══ ARTICLES ═══ */
+#articles{background:var(--paper)}
+.articles-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:3.5rem;flex-wrap:wrap;gap:1rem}
+.view-all{
+  font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold);text-decoration:none;font-weight:500;
+  border-bottom:1px solid var(--gold);padding-bottom:2px;
+  transition:color .2s,border-color .2s;
+}
+.view-all:hover{color:var(--rust);border-color:var(--rust)}
+.articles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+.article-card{
+  background:var(--white);border-radius:12px;overflow:hidden;
+  box-shadow:var(--shadow);transition:transform .3s,box-shadow .3s;
+  cursor:pointer;text-decoration:none;color:inherit;display:block;
+}
+.article-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-lg)}
+.article-card-img{height:220px;overflow:hidden;position:relative}
+.article-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.article-card:hover .article-card-img img{transform:scale(1.07)}
+.article-card-tag{
+  position:absolute;top:1rem;left:1rem;
+  background:var(--gold);color:white;
+  font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+  padding:.3rem .8rem;border-radius:100px;font-weight:500;
+}
+.article-card-body{padding:1.6rem}
+.article-card-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.35rem;line-height:1.3;margin-bottom:.7rem;font-weight:600;
+  transition:color .2s;
+}
+.article-card:hover .article-card-title{color:var(--gold)}
+.article-card-excerpt{font-size:.88rem;color:var(--muted);line-height:1.65}
+.article-card-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--cream);
+  font-size:.78rem;color:var(--muted);
+}
+.read-link{color:var(--gold);font-weight:500;text-decoration:none;letter-spacing:.04em}
+
+/* FEATURED article (big) */
+.articles-featured{display:grid;grid-template-columns:1.4fr 1fr;gap:2rem;margin-bottom:2rem}
+.article-card-big .article-card-img{height:320px}
+.article-card-big .article-card-title{font-size:1.8rem}
+
+/* ═══ ABOUT ═══ */
+#about{background:var(--cream)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.about-img{position:relative}
+.about-img img{width:100%;height:500px;object-fit:cover;border-radius:12px;display:block;box-shadow:var(--shadow-lg)}
+.about-badge{
+  position:absolute;bottom:-1.5rem;right:-1.5rem;
+  background:var(--dark);color:white;
+  padding:1.2rem 1.8rem;border-radius:10px;
+  box-shadow:var(--shadow);
+}
+.about-badge-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.4rem;font-weight:700;color:var(--gold-light);display:block;line-height:1;
+}
+.about-badge-label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;opacity:.7;margin-top:.3rem}
+.about-text .sec-title{margin-bottom:.8rem}
+.about-text p{color:var(--muted);margin-bottom:1.2rem;font-size:.98rem}
+.about-values{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:2rem}
+.value-item{
+  padding:1.2rem;border-left:3px solid var(--gold);
+  background:rgba(196,137,42,.06);border-radius:0 8px 8px 0;
+}
+.value-title{font-weight:600;font-size:.92rem;margin-bottom:.3rem;color:var(--ink)}
+.value-desc{font-size:.82rem;color:var(--muted)}
+
+/* ═══ TESTIMONIALS ═══ */
+#testimonials{background:var(--paper)}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:3rem}
+.testi-card{
+  background:var(--white);padding:2rem;border-radius:12px;
+  box-shadow:var(--shadow);position:relative;
+}
+.testi-card::before{
+  content:'"';
+  font-family:'Cormorant Garamond',serif;font-size:5rem;
+  color:var(--gold);opacity:.2;position:absolute;top:.5rem;left:1.2rem;
+  line-height:1;pointer-events:none;
+}
+.testi-stars{display:flex;gap:3px;margin-bottom:1rem}
+.star{
+  width:14px;height:14px;border-radius:50%;
+  background:var(--gold);opacity:.85;
+  clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+}
+.testi-text{font-size:.92rem;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:.9rem}
+.testi-avatar{width:48px;height:48px;border-radius:50%;overflow:hidden;flex-shrink:0}
+.testi-avatar img{width:100%;height:100%;object-fit:cover}
+.testi-name{font-weight:600;font-size:.9rem;color:var(--ink)}
+.testi-role{font-size:.78rem;color:var(--muted)}
+
+/* ═══ NEWSLETTER ═══ */
+#newsletter{
+  position:relative;overflow:hidden;padding:6rem 5vw;
+}
+.newsletter-bg{
+  position:absolute;inset:0;
+}
+.newsletter-bg img{width:100%;height:100%;object-fit:cover;display:block}
+.newsletter-overlay{position:absolute;inset:0;background:rgba(18,13,6,.88)}
+.newsletter-inner{
+  position:relative;z-index:2;
+  max-width:620px;margin:0 auto;text-align:center;
+}
+.newsletter-inner .sec-title{color:white}
+.newsletter-inner p{color:rgba(255,255,255,.7);margin-bottom:2rem;font-size:1rem}
+.newsletter-form{display:flex;gap:.8rem;max-width:480px;margin:0 auto}
+.newsletter-form input{
+  flex:1;padding:.85rem 1.2rem;border:1.5px solid rgba(255,255,255,.2);
+  border-radius:100px;background:rgba(255,255,255,.1);color:white;
+  font-family:inherit;font-size:.9rem;
+  transition:border-color .2s,background .2s;
+}
+.newsletter-form input::placeholder{color:rgba(255,255,255,.4)}
+.newsletter-form input:focus{outline:none;border-color:var(--gold-light);background:rgba(255,255,255,.15)}
+.newsletter-form button{
+  padding:.85rem 1.8rem;background:var(--gold);color:white;
+  border:none;border-radius:100px;cursor:pointer;
+  font-family:inherit;font-size:.88rem;font-weight:500;
+  white-space:nowrap;transition:background .2s,transform .15s;
+}
+.newsletter-form button:hover{background:var(--rust);transform:translateY(-2px)}
+.newsletter-note{font-size:.74rem;color:rgba(255,255,255,.35);margin-top:.8rem}
+
+/* ═══ CONTACT ═══ */
+#contact{background:var(--cream)}
+.contact-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:5rem;align-items:start}
+.contact-info .sec-title{margin-bottom:.8rem}
+.contact-info p{color:var(--muted);margin-bottom:2rem;font-size:.98rem}
+.contact-item{display:flex;flex-direction:column;gap:.2rem;margin-bottom:1.4rem}
+.contact-label{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:500}
+.contact-value{font-size:.95rem;color:var(--ink)}
+.form-box{background:var(--white);padding:2.5rem;border-radius:14px;box-shadow:var(--shadow)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.form-group{display:flex;flex-direction:column;margin-bottom:1.4rem}
+.form-group label{font-size:.78rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem}
+.form-group input,
+.form-group textarea,
+.form-group select{
+  padding:.75rem 1rem;border:1.5px solid var(--warm);
+  border-radius:var(--r);font-family:inherit;font-size:.9rem;
+  background:var(--paper);color:var(--ink);
+  transition:border-color .2s,box-shadow .2s;resize:vertical;
+}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{
+  outline:none;border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(196,137,42,.12);
+}
+.form-group textarea{min-height:120px}
+.form-submit{
+  width:100%;padding:.9rem;border:none;border-radius:100px;
+  background:var(--gold);color:white;font-size:.9rem;font-weight:500;
+  cursor:pointer;font-family:inherit;letter-spacing:.06em;
+  transition:background .2s,transform .15s;
+}
+.form-submit:hover{background:var(--rust);transform:translateY(-2px)}
+.success-msg{
+  display:none;background:#e8f5e9;color:#2e7d32;
+  padding:.9rem 1.2rem;border-radius:var(--r);margin-bottom:1.2rem;
+  border-left:3px solid #2e7d32;font-size:.88rem;
+}
+
+/* ═══ FOOTER ═══ */
+footer{background:var(--dark);padding:4rem 5vw 2.5rem}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.footer-brand .nav-logo img{height:38px;margin-bottom:1rem}
+.footer-brand p{font-size:.88rem;color:rgba(255,255,255,.45);line-height:1.7;max-width:28ch}
+.footer-col h4{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-light);margin-bottom:1.2rem;font-weight:500}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:.6rem}
+.footer-col a{color:rgba(255,255,255,.5);text-decoration:none;font-size:.85rem;transition:color .2s}
+.footer-col a:hover{color:var(--gold-light)}
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,.08);padding-top:2rem;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+  font-size:.78rem;color:rgba(255,255,255,.3);
+}
+.footer-bottom a{color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s}
+.footer-bottom a:hover{color:var(--gold-light)}
+
+/* ═══ PAGE OVERLAY MODAL ═══ */
+.page-overlay{
+  display:none;position:fixed;inset:0;z-index:2000;
+  background:var(--paper);overflow-y:auto;
+}
+.page-overlay.open{display:block}
+.page-overlay-inner{max-width:760px;margin:0 auto;padding:6rem 2rem 4rem}
+.overlay-close{
+  position:fixed;top:1.5rem;right:2rem;
+  background:var(--dark);color:white;border:none;
+  width:44px;height:44px;border-radius:50%;
+  font-size:1.4rem;cursor:pointer;z-index:2001;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;
+}
+.overlay-close:hover{background:var(--rust)}
+.overlay-kicker{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);font-weight:500;margin-bottom:.6rem;display:block}
+.overlay-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:700;color:var(--ink);line-height:1.15;margin-bottom:1rem}
+.overlay-meta{font-size:.8rem;color:var(--muted);margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--warm)}
+.overlay-hero-img{width:100%;height:380px;object-fit:cover;border-radius:10px;margin-bottom:2.5rem;display:block}
+.overlay-body{font-size:1.05rem;color:#3a2c1a;line-height:1.85;font-weight:300}
+.overlay-body p{margin-bottom:1.4rem}
+.overlay-body h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem;margin:2rem 0 .8rem;color:var(--ink)}
+.overlay-body blockquote{
+  border-left:3px solid var(--gold);padding-left:1.4rem;margin:1.8rem 0;
+  font-style:italic;color:var(--muted);font-size:1.1rem;
+}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scrollPulse{0%,100%{opacity:.5;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.15)}}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:1100px){
+  .articles-featured{grid-template-columns:1fr}
+  .articles-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:900px){
+  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .about-badge{right:0;bottom:-1rem}
+  .testi-grid{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+  .burger{display:flex}
+}
+@media(max-width:640px){
+  .articles-grid,.articles-featured{grid-template-columns:1fr}
+  .testi-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .newsletter-form{flex-direction:column}
+  .about-values{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .btn-ghost{margin-left:0;margin-top:.8rem;display:block;text-align:center}
+  section{padding:4rem 5vw}
+  .overlay-hero-img{height:220px}
+}
+@media(max-width:420px){
+  .footer-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNjAnIGhlaWdodD0nNDgnIHZpZXdCb3g9JzAgMCAxNjAgNDgnPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSdsZycgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyNlOGI4NmQnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjYzQ3MzJhJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PScyNCcgY3k9JzI0JyByPScyMCcgZmlsbD0ndXJsKCNsZyknLz4KICA8cGF0aCBkPSdNMjQgMTAgTDI0IDI0IEwzNCAzMCcgc3Ryb2tlPSd3aGl0ZScgc3Ryb2tlLXdpZHRoPScyLjUnIGZpbGw9J25vbmUnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcgc3Ryb2tlLWxpbmVqb2luPSdyb3VuZCcvPgogIDxwYXRoIGQ9J00xOCAyNCBRMjQgMTYgMzAgMjQgUTI0IDMyIDE4IDI0WicgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuOScvPgogIDx0ZXh0IHg9JzUyJyB5PSczMCcgZm9udC1mYW1pbHk9J0dlb3JnaWEsc2VyaWYnIGZvbnQtc2l6ZT0nMTgnIGZvbnQtd2VpZ2h0PSdib2xkJyBmaWxsPScjMWExMjA4Jz5BU0NFTkQ8L3RleHQ+CiAgPHRleHQgeD0nNTInIHk9JzQyJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPSc5JyBmaWxsPScjN2E2MjUwJyBsZXR0ZXItc3BhY2luZz0nMyc+V0lUSElOPC90ZXh0Pgo8L3N2Zz4=" alt="Ascend Within" />
+  </a>
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#articles">Articles</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#testimonials">Stories</a></li>
+    <li><a href="#contact" class="nav-cta">Get Started</a></li>
+  </ul>
+  <div class="burger" id="burger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <span class="mobile-close" onclick="closeMobileNav()">&#x2715;</span>
+  <a href="#hero" onclick="closeMobileNav()">Home</a>
+  <a href="#articles" onclick="closeMobileNav()">Articles</a>
+  <a href="#about" onclick="closeMobileNav()">About</a>
+  <a href="#testimonials" onclick="closeMobileNav()">Stories</a>
+  <a href="#newsletter" onclick="closeMobileNav()">Newsletter</a>
+  <a href="#contact" onclick="closeMobileNav()">Contact</a>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-bg">
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjAwJyBoZWlnaHQ9JzcwMCcgdmlld0JveD0nMCAwIDEyMDAgNzAwJz4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0nc2t5JyB4MT0nMCUnIHkxPScwJScgeDI9JzAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYTBhMmUnLz4KICAgICAgPHN0b3Agb2Zmc2V0PSczNSUnIHN0b3AtY29sb3I9JyM2YjJkNWUnLz4KICAgICAgPHN0b3Agb2Zmc2V0PSc2NSUnIHN0b3AtY29sb3I9JyNlODY5M2EnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjZjVjMTZjJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSdzdW4nIHgxPScwJScgeTE9JzAlJyB4Mj0nMTAwJScgeTI9JzEwMCUnPgogICAgICA8c3RvcCBvZmZzZXQ9JzAlJyBzdG9wLWNvbG9yPScjZmZlMDY2Jy8+CiAgICAgIDxzdG9wIG9mZnNldD0nMTAwJScgc3RvcC1jb2xvcj0nI2ZmYWEwMCcvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0nZ2xvdycgY3g9JzUwJScgY3k9JzY1JScgcj0nMzAlJz4KICAgICAgPHN0b3Agb2Zmc2V0PScwJScgc3RvcC1jb2xvcj0nI2ZmY2M1NScgc3RvcC1vcGFjaXR5PScwLjUnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjZTg2OTNhJyBzdG9wLW9wYWNpdHk9JzAnLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPScxMjAwJyBoZWlnaHQ9JzcwMCcgZmlsbD0ndXJsKCNza3kpJy8+CiAgPHJlY3Qgd2lkdGg9JzEyMDAnIGhlaWdodD0nNzAwJyBmaWxsPSd1cmwoI2dsb3cpJy8+CiAgPCEtLSBTdW4gLS0+CiAgPGNpcmNsZSBjeD0nNjAwJyBjeT0nNDMwJyByPSc4MCcgZmlsbD0ndXJsKCNzdW4pJyBvcGFjaXR5PScwLjkyJy8+CiAgPGNpcmNsZSBjeD0nNjAwJyBjeT0nNDMwJyByPScxMDAnIGZpbGw9JyNmZmNjNTUnIG9wYWNpdHk9JzAuMicvPgogIDxjaXJjbGUgY3g9JzYwMCcgY3k9JzQzMCcgcj0nMTMwJyBmaWxsPScjZmZhYTAwJyBvcGFjaXR5PScwLjEnLz4KICA8IS0tIE1vdW50YWlucyAtLT4KICA8cG9seWdvbiBwb2ludHM9JzAsNzAwIDIwMCw0MDAgNDAwLDUyMCA2MDAsMzUwIDgwMCw0ODAgMTAwMCwzODAgMTIwMCw0NjAgMTIwMCw3MDAnIGZpbGw9JyMyYTFhMGUnIG9wYWNpdHk9JzAuODUnLz4KICA8cG9seWdvbiBwb2ludHM9JzAsNzAwIDE1MCw0ODAgMzUwLDU2MCA1NTAsNDIwIDc1MCw1MjAgOTUwLDQzMCAxMjAwLDUwMCAxMjAwLDcwMCcgZmlsbD0nIzFhMGUwNicgb3BhY2l0eT0nMC42Jy8+CiAgPCEtLSBTaXR0aW5nIGZpZ3VyZSBzaWxob3VldHRlIC0tPgogIDxlbGxpcHNlIGN4PSc2MDAnIGN5PSc2MTAnIHJ4PScyOCcgcnk9JzgnIGZpbGw9JyMwYTA2MDQnIG9wYWNpdHk9JzAuNycvPgogIDxjaXJjbGUgY3g9JzYwMCcgY3k9JzU2Micgcj0nMTQnIGZpbGw9JyMwZDA4MDQnLz4KICA8cGF0aCBkPSdNNTgwIDU4MCBRNjAwIDU3MCA2MjAgNTgwIEw2MjggNjIwIEw1NzIgNjIwIFonIGZpbGw9JyMwZDA4MDQnLz4KICA8cGF0aCBkPSdNNTcyIDU5MCBRNTU1IDYwNSA1NDggNjE1JyBzdHJva2U9JyMwZDA4MDQnIHN0cm9rZS13aWR0aD0nNycgZmlsbD0nbm9uZScgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJy8+CiAgPHBhdGggZD0nTTYyOCA1OTAgUTY0NSA2MDUgNjUyIDYxNScgc3Ryb2tlPScjMGQwODA0JyBzdHJva2Utd2lkdGg9JzcnIGZpbGw9J25vbmUnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDwhLS0gU3RhcnMgLS0+CiAgPGNpcmNsZSBjeD0nMTIwJyBjeT0nODAnIHI9JzEuNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuOCcvPgogIDxjaXJjbGUgY3g9JzMwMCcgY3k9JzUwJyByPScxJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC43Jy8+CiAgPGNpcmNsZSBjeD0nODUwJyBjeT0nNjAnIHI9JzEuOCcgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuOScvPgogIDxjaXJjbGUgY3g9JzEwNTAnIGN5PSc5MCcgcj0nMS4yJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC42Jy8+CiAgPGNpcmNsZSBjeD0nMjAwJyBjeT0nMTMwJyByPScxJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC41Jy8+CiAgPGNpcmNsZSBjeD0nOTgwJyBjeT0nNDAnIHI9JzEuNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuOCcvPgogIDxjaXJjbGUgY3g9JzQ1MCcgY3k9JzcwJyByPScxJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC42Jy8+CiAgPGNpcmNsZSBjeD0nNzUwJyBjeT0nMTAwJyByPScxLjMnIGZpbGw9J3doaXRlJyBvcGFjaXR5PScwLjcnLz4KPC9zdmc+" alt="Personal growth journey at sunrise" />
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="hero-kicker">Personal Development &nbsp;&bull;&nbsp; Growth &nbsp;&bull;&nbsp; Transformation</span>
+    <h1 class="hero-title">Become the Best<br><em>Version of You</em></h1>
+    <p class="hero-sub">Practical wisdom, science-backed strategies, and honest stories to help you grow with intention — mind, habits, and purpose.</p>
+    <div>
+      <a href="#articles" class="btn-primary">Explore Articles</a>
+      <a href="#newsletter" class="btn-ghost">Join the Community</a>
+    </div>
+  </div>
+  <div class="hero-scroll" onclick="document.getElementById('quote').scrollIntoView({behavior:'smooth'})">
+    <span>Scroll</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══ QUOTE ═══ -->
+<div id="quote">
+  <div class="quote-inner reveal">
+    <span class="quote-mark">"</span>
+    <p class="quote-text">The only person you are destined to become is the person you decide to be.</p>
+    <p class="quote-author">— Ralph Waldo Emerson</p>
+  </div>
+</div>
+
+<!-- ═══ ARTICLES ═══ -->
+<section id="articles">
+  <div class="articles-header">
+    <div>
+      <span class="sec-kicker">Latest Writing</span>
+      <div class="gold-bar"></div>
+      <h2 class="sec-title">Ideas to <em>Elevate</em> Your Life</h2>
+    </div>
+    <a href="#articles" class="view-all">View All Articles</a>
+  </div>
+
+  <!-- Featured Row -->
+  <div class="articles-featured reveal">
+    <a class="article-card article-card-big" href="#" onclick="openArticle('art1',event)">
+      <div class="article-card-img">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnMScgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwZDIxMzcnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjMWE0YTZiJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNiZzEpJy8+CiAgPCEtLSBBYnN0cmFjdCBicmFpbiB3YXZlcyAtLT4KICA8cGF0aCBkPSdNMTAwIDI1MCBRMjAwIDE1MCAzMDAgMjUwIFE0MDAgMzUwIDUwMCAyNTAgUTYwMCAxNTAgNzAwIDI1MCcgc3Ryb2tlPScjNGZjM2Y3JyBzdHJva2Utd2lkdGg9JzMnIGZpbGw9J25vbmUnIG9wYWNpdHk9JzAuNicvPgogIDxwYXRoIGQ9J00xMDAgMjgwIFEyMDAgMTgwIDMwMCAyODAgUTQwMCAzODAgNTAwIDI4MCBRNjAwIDE4MCA3MDAgMjgwJyBzdHJva2U9JyM4MWQ0ZmEnIHN0cm9rZS13aWR0aD0nMicgZmlsbD0nbm9uZScgb3BhY2l0eT0nMC40Jy8+CiAgPHBhdGggZD0nTTEwMCAyMjAgUTIwMCAxMjAgMzAwIDIyMCBRNDAwIDMyMCA1MDAgMjIwIFE2MDAgMTIwIDcwMCAyMjAnIHN0cm9rZT0nIzI5YjZmNicgc3Ryb2tlLXdpZHRoPScxLjUnIGZpbGw9J25vbmUnIG9wYWNpdHk9JzAuMycvPgogIDwhLS0gQ2VudHJhbCBjaXJjbGUgLS0+CiAgPGNpcmNsZSBjeD0nNDAwJyBjeT0nMjUwJyByPSc4MCcgZmlsbD0nbm9uZScgc3Ryb2tlPScjNGZjM2Y3JyBzdHJva2Utd2lkdGg9JzInIG9wYWNpdHk9JzAuNScvPgogIDxjaXJjbGUgY3g9JzQwMCcgY3k9JzI1MCcgcj0nNTUnIGZpbGw9JyMxNTY1YzAnIG9wYWNpdHk9JzAuNicvPgogIDxjaXJjbGUgY3g9JzQwMCcgY3k9JzI1MCcgcj0nMzAnIGZpbGw9JyMxZTg4ZTUnIG9wYWNpdHk9JzAuOCcvPgogIDwhLS0gSGVhZCBzaWxob3VldHRlIG91dGxpbmUgLS0+CiAgPHBhdGggZD0nTTM2MCAyMDAgUTM0MCAyMDAgMzM1IDIyMCBRMzMwIDI0MCAzNDAgMjYwIFEzNTAgMjg1IDM3MCAyOTAgUTM4MCAzMTAgMzgwIDMzMCBMNDIwIDMzMCBRNDIwIDMxMCA0MzAgMjkwIFE0NTAgMjg1IDQ2MCAyNjAgUTQ3MCAyNDAgNDY1IDIyMCBRNDYwIDIwMCA0NDAgMjAwIFonIGZpbGw9J25vbmUnIHN0cm9rZT0nd2hpdGUnIHN0cm9rZS13aWR0aD0nMicgb3BhY2l0eT0nMC43Jy8+CiAgPCEtLSBMaWdodCByYXlzIC0tPgogIDxsaW5lIHgxPSc0MDAnIHkxPScxMzAnIHgyPSc0MDAnIHkyPScxMDAnIHN0cm9rZT0nI2ZmZTA2Nicgc3Ryb2tlLXdpZHRoPScyJyBvcGFjaXR5PScwLjYnLz4KICA8bGluZSB4MT0nNDUwJyB5MT0nMTQ1JyB4Mj0nNDcwJyB5Mj0nMTIwJyBzdHJva2U9JyNmZmUwNjYnIHN0cm9rZS13aWR0aD0nMS41JyBvcGFjaXR5PScwLjQnLz4KICA8bGluZSB4MT0nMzUwJyB5MT0nMTQ1JyB4Mj0nMzMwJyB5Mj0nMTIwJyBzdHJva2U9JyNmZmUwNjYnIHN0cm9rZS13aWR0aD0nMS41JyBvcGFjaXR5PScwLjQnLz4KICA8dGV4dCB4PSc0MDAnIHk9JzQzMCcgZm9udC1mYW1pbHk9J0dlb3JnaWEsc2VyaWYnIGZvbnQtc2l6ZT0nMjInIGZpbGw9J3doaXRlJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBvcGFjaXR5PScwLjknIGZvbnQtc3R5bGU9J2l0YWxpYyc+VGhlIFBvd2VyIG9mIE1pbmRzZXQ8L3RleHQ+Cjwvc3ZnPg==" alt="Mindset article" />
+        <span class="article-card-tag">Mindset</span>
+      </div>
+      <div class="article-card-body">
+        <h3 class="article-card-title">Rewiring Your Mind: The Science of a Growth Mindset</h3>
+        <p class="article-card-excerpt">Your brain is not fixed. Every belief you hold about your own potential was learned — and anything learned can be unlearned. Here is how to begin the rewire.</p>
+        <div class="article-card-meta">
+          <span>April 10, 2026 &nbsp;&middot;&nbsp; 9 min read</span>
+          <a class="read-link" href="#" onclick="openArticle('art1',event)">Read &rarr;</a>
+        </div>
+      </div>
+    </a>
+    <a class="article-card article-card-big" href="#" onclick="openArticle('art2',event)">
+      <div class="article-card-img">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnMicgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYjNhMmEnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjMmU2YjQ1Jy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNiZzIpJy8+CiAgPCEtLSBDYWxlbmRhciBncmlkIC0tPgogIDxyZWN0IHg9JzE4MCcgeT0nMTIwJyB3aWR0aD0nNDQwJyBoZWlnaHQ9JzI2MCcgcng9JzEyJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC4wOCcvPgogIDwhLS0gRGF5IGJsb2NrcyDigJQgaGFiaXQgdHJhY2tlciBzdHlsZSAtLT4KICA8cmVjdCB4PScyMTAnIHk9JzE1MCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzI1OCcgeT0nMTUwJyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nMzA2JyB5PScxNTAnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM4MWM3ODQnIG9wYWNpdHk9JzAuNicvPgogIDxyZWN0IHg9JzM1NCcgeT0nMTUwJyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nNDAyJyB5PScxNTAnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSc0NTAnIHk9JzE1MCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8cmVjdCB4PSc0OTgnIHk9JzE1MCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzU0NicgeT0nMTUwJyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nMjEwJyB5PScxOTgnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PScyNTgnIHk9JzE5OCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8cmVjdCB4PSczMDYnIHk9JzE5OCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzM1NCcgeT0nMTk4JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nNDAyJyB5PScxOTgnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM2NmJiNmEnIG9wYWNpdHk9JzAuNycvPgogIDxyZWN0IHg9JzQ1MCcgeT0nMTk4JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nNDk4JyB5PScxOTgnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSc1NDYnIHk9JzE5OCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8cmVjdCB4PScyMTAnIHk9JzI0Nicgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzI1OCcgeT0nMjQ2JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nMzA2JyB5PScyNDYnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSczNTQnIHk9JzI0Nicgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8cmVjdCB4PSc0MDInIHk9JzI0Nicgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzQ1MCcgeT0nMjQ2JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjODFjNzg0JyBvcGFjaXR5PScwLjY1Jy8+CiAgPHJlY3QgeD0nNDk4JyB5PScyNDYnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSc1NDYnIHk9JzI0Nicgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzIxMCcgeT0nMjk0JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC4xNScvPgogIDxyZWN0IHg9JzI1OCcgeT0nMjk0JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nMzA2JyB5PScyOTQnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSczNTQnIHk9JzI5NCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzQwMicgeT0nMjk0JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nNDUwJyB5PScyOTQnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSc0OTgnIHk9JzI5NCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8cmVjdCB4PSc1NDYnIHk9JzI5NCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDx0ZXh0IHg9JzQwMCcgeT0nNDMwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScyMicgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIG9wYWNpdHk9JzAuOScgZm9udC1zdHlsZT0naXRhbGljJz5CdWlsZGluZyBMYXN0aW5nIEhhYml0czwvdGV4dD4KPC9zdmc+" alt="Habits article" />
+        <span class="article-card-tag">Habits</span>
+      </div>
+      <div class="article-card-body">
+        <h3 class="article-card-title">The 21-Day Myth and What Actually Makes Habits Stick</h3>
+        <p class="article-card-excerpt">Science dismantles the popular formula — and reveals the three elements that actually determine whether a behaviour becomes automatic.</p>
+        <div class="article-card-meta">
+          <span>April 6, 2026 &nbsp;&middot;&nbsp; 7 min read</span>
+          <a class="read-link" href="#" onclick="openArticle('art2',event)">Read &rarr;</a>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- 4-card grid -->
+  <div class="articles-grid reveal">
+    <a class="article-card" href="#" onclick="openArticle('art3',event)">
+      <div class="article-card-img">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnMycgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMyYTFhMDAnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjNWEzYTAwJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSdzcG90bGlnaHQnIGN4PSc1MCUnIGN5PSc1MCUnIHI9JzQwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyNmZmUwNjYnIHN0b3Atb3BhY2l0eT0nMC4zJy8+CiAgICAgIDxzdG9wIG9mZnNldD0nMTAwJScgc3RvcC1jb2xvcj0nI2M0N2EwMCcgc3RvcC1vcGFjaXR5PScwJy8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNiZzMpJy8+CiAgPHJlY3Qgd2lkdGg9JzgwMCcgaGVpZ2h0PSc1MDAnIGZpbGw9J3VybCgjc3BvdGxpZ2h0KScvPgogIDwhLS0gQ29uY2VudHJpYyByaW5ncyAtIHRhcmdldCAtLT4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PScyNTAnIHI9JzE4MCcgZmlsbD0nbm9uZScgc3Ryb2tlPScjZThhMDAwJyBzdHJva2Utd2lkdGg9JzEuNScgb3BhY2l0eT0nMC4yNScvPgogIDxjaXJjbGUgY3g9JzQwMCcgY3k9JzI1MCcgcj0nMTQwJyBmaWxsPSdub25lJyBzdHJva2U9JyNlOGEwMDAnIHN0cm9rZS13aWR0aD0nMS41JyBvcGFjaXR5PScwLjM1Jy8+CiAgPGNpcmNsZSBjeD0nNDAwJyBjeT0nMjUwJyByPScxMDAnIGZpbGw9J25vbmUnIHN0cm9rZT0nI2ZmYzEwNycgc3Ryb2tlLXdpZHRoPScyJyBvcGFjaXR5PScwLjUnLz4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PScyNTAnIHI9JzYwJyBmaWxsPSdub25lJyBzdHJva2U9JyNmZmQ3NDAnIHN0cm9rZS13aWR0aD0nMi41JyBvcGFjaXR5PScwLjcnLz4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PScyNTAnIHI9JzI1JyBmaWxsPScjZmZlMDY2JyBvcGFjaXR5PScwLjknLz4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PScyNTAnIHI9JzgnIGZpbGw9J3doaXRlJyBvcGFjaXR5PScxJy8+CiAgPCEtLSBDcm9zcyBoYWlycyAtLT4KICA8bGluZSB4MT0nNDAwJyB5MT0nNTAnIHgyPSc0MDAnIHkyPScyMDAnIHN0cm9rZT0nI2ZmYzEwNycgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuNCcvPgogIDxsaW5lIHgxPSc0MDAnIHkxPSczMDAnIHgyPSc0MDAnIHkyPSc0NTAnIHN0cm9rZT0nI2ZmYzEwNycgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuNCcvPgogIDxsaW5lIHgxPScyMDAnIHkxPScyNTAnIHgyPSczNTAnIHkyPScyNTAnIHN0cm9rZT0nI2ZmYzEwNycgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuNCcvPgogIDxsaW5lIHgxPSc0NTAnIHkxPScyNTAnIHgyPSc2MDAnIHkyPScyNTAnIHN0cm9rZT0nI2ZmYzEwNycgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuNCcvPgogIDx0ZXh0IHg9JzQwMCcgeT0nNDMwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScyMicgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIG9wYWNpdHk9JzAuOScgZm9udC1zdHlsZT0naXRhbGljJz5NYXN0ZXJpbmcgRGVlcCBGb2N1czwvdGV4dD4KPC9zdmc+" alt="Focus article" />
+        <span class="article-card-tag">Focus</span>
+      </div>
+      <div class="article-card-body">
+        <h3 class="article-card-title">Deep Work in a Distracted World</h3>
+        <p class="article-card-excerpt">Reclaim your concentration with the principles that separate high performers from everyone else.</p>
+        <div class="article-card-meta">
+          <span>Mar 30, 2026 &nbsp;&middot;&nbsp; 6 min</span>
+          <a class="read-link" href="#" onclick="openArticle('art3',event)">Read &rarr;</a>
+        </div>
+      </div>
+    </a>
+    <a class="article-card" href="#" onclick="openArticle('art4',event)">
+      <div class="article-card-img">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnNCcgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYTBhMmEnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjM2QxYTVhJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNiZzQpJy8+CiAgPCEtLSBSaXNpbmcgZ3JhcGggbGluZSAtLT4KICA8cG9seWxpbmUgcG9pbnRzPScxMDAsNDAwIDIwMCwzNjAgMjUwLDM4MCAzNTAsMzAwIDQyMCwzMjAgNTIwLDIwMCA2MjAsMTgwIDcyMCwxMDAnIHN0cm9rZT0nI2NlOTNkOCcgc3Ryb2tlLXdpZHRoPSczJyBmaWxsPSdub25lJyBvcGFjaXR5PScwLjgnLz4KICA8IS0tIERpcHMgd2l0aCBib3VuY2UgYmFjayAtLT4KICA8cG9seWxpbmUgcG9pbnRzPScxMDAsNDAwIDIwMCwzNjAgMjUwLDM4MCAzNTAsMzAwIDQyMCwzMjAgNTIwLDIwMCA2MjAsMTgwIDcyMCwxMDAnIHN0cm9rZT0nI2UxYmVlNycgc3Ryb2tlLXdpZHRoPScxJyBmaWxsPSdub25lJyBvcGFjaXR5PScwLjMnLz4KICA8IS0tIEFyZWEgZmlsbCAtLT4KICA8cG9seWdvbiBwb2ludHM9JzEwMCw0MDAgMjAwLDM2MCAyNTAsMzgwIDM1MCwzMDAgNDIwLDMyMCA1MjAsMjAwIDYyMCwxODAgNzIwLDEwMCA3MjAsNTAwIDEwMCw1MDAnIGZpbGw9JyM3YjFmYTInIG9wYWNpdHk9JzAuMTUnLz4KICA8IS0tIERvdHMgYXQgcG9pbnRzIC0tPgogIDxjaXJjbGUgY3g9JzEwMCcgY3k9JzQwMCcgcj0nNicgZmlsbD0nI2NlOTNkOCcvPgogIDxjaXJjbGUgY3g9JzI1MCcgY3k9JzM4MCcgcj0nNicgZmlsbD0nI2JhNjhjOCcvPgogIDxjaXJjbGUgY3g9JzQyMCcgY3k9JzMyMCcgcj0nNicgZmlsbD0nI2FiNDdiYycvPgogIDxjaXJjbGUgY3g9JzYyMCcgY3k9JzE4MCcgcj0nOCcgZmlsbD0nI2UwNDBmYicvPgogIDxjaXJjbGUgY3g9JzcyMCcgY3k9JzEwMCcgcj0nMTAnIGZpbGw9J3doaXRlJy8+CiAgPCEtLSBTdGFycyBpbiBiYWNrZ3JvdW5kIC0tPgogIDxjaXJjbGUgY3g9JzE1MCcgY3k9JzEwMCcgcj0nMS41JyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC41Jy8+CiAgPGNpcmNsZSBjeD0nNTAwJyBjeT0nODAnIHI9JzEnIGZpbGw9J3doaXRlJyBvcGFjaXR5PScwLjQnLz4KICA8Y2lyY2xlIGN4PSc2ODAnIGN5PScyMDAnIHI9JzEuNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMycvPgogIDxjaXJjbGUgY3g9JzM1MCcgY3k9JzE1MCcgcj0nMScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuNCcvPgogIDx0ZXh0IHg9JzQwMCcgeT0nNDYwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScyMicgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIG9wYWNpdHk9JzAuOScgZm9udC1zdHlsZT0naXRhbGljJz5UaGUgUGF0aCBvZiBSZXNpbGllbmNlPC90ZXh0Pgo8L3N2Zz4=" alt="Resilience article" />
+        <span class="article-card-tag">Resilience</span>
+      </div>
+      <div class="article-card-body">
+        <h3 class="article-card-title">Why Failure Is the Foundation of Growth</h3>
+        <p class="article-card-excerpt">Reframing setbacks not as evidence of your limits, but as the raw material of your future strength.</p>
+        <div class="article-card-meta">
+          <span>Mar 24, 2026 &nbsp;&middot;&nbsp; 8 min</span>
+          <a class="read-link" href="#" onclick="openArticle('art4',event)">Read &rarr;</a>
+        </div>
+      </div>
+    </a>
+    <a class="article-card" href="#" onclick="openArticle('art5',event)">
+      <div class="article-card-img">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnNScgeDE9JzAlJyB5MT0nMCUnIHgyPScwJScgeTI9JzEwMCUnPgogICAgICA8c3RvcCBvZmZzZXQ9JzAlJyBzdG9wLWNvbG9yPScjZmY5YTU2Jy8+CiAgICAgIDxzdG9wIG9mZnNldD0nNTAlJyBzdG9wLWNvbG9yPScjZmZjYzcwJy8+CiAgICAgIDxzdG9wIG9mZnNldD0nMTAwJScgc3RvcC1jb2xvcj0nI2ZmZThhMCcvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0nc3VuNScgY3g9JzUwJScgY3k9JzQwJScgcj0nMjUlJz4KICAgICAgPHN0b3Agb2Zmc2V0PScwJScgc3RvcC1jb2xvcj0nI2ZmZicgc3RvcC1vcGFjaXR5PScwLjknLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjZmZhYTAwJyBzdG9wLW9wYWNpdHk9JzAnLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2JnNSknLz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNzdW41KScvPgogIDwhLS0gSG9yaXpvbiBsaW5lIHdpdGggaGlsbHMgLS0+CiAgPGVsbGlwc2UgY3g9JzQwMCcgY3k9JzUyMCcgcng9JzYwMCcgcnk9JzEyMCcgZmlsbD0nIzhkNmUzNicgb3BhY2l0eT0nMC42Jy8+CiAgPGVsbGlwc2UgY3g9JzIwMCcgY3k9JzUxMCcgcng9JzMwMCcgcnk9JzgwJyBmaWxsPScjNmQ0YzFmJyBvcGFjaXR5PScwLjUnLz4KICA8ZWxsaXBzZSBjeD0nNjUwJyBjeT0nNTE1JyByeD0nMjgwJyByeT0nNzUnIGZpbGw9JyM3ZDVjMmYnIG9wYWNpdHk9JzAuNScvPgogIDwhLS0gU3VuIGRpc2sgLS0+CiAgPGNpcmNsZSBjeD0nNDAwJyBjeT0nMjAwJyByPSc1NScgZmlsbD0nI2ZmZjllMCcgb3BhY2l0eT0nMC45NScvPgogIDxjaXJjbGUgY3g9JzQwMCcgY3k9JzIwMCcgcj0nNDInIGZpbGw9JyNmZmU1NjYnLz4KICA8IS0tIFN1biByYXlzIC0tPgogIDxsaW5lIHgxPSc0MDAnIHkxPScxMzAnIHgyPSc0MDAnIHkyPScxMDUnIHN0cm9rZT0nI2ZmZTU2Nicgc3Ryb2tlLXdpZHRoPSczJyBvcGFjaXR5PScwLjcnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDxsaW5lIHgxPSc0NjAnIHkxPScxNDgnIHgyPSc0NzgnIHkyPScxMzAnIHN0cm9rZT0nI2ZmZTU2Nicgc3Ryb2tlLXdpZHRoPSczJyBvcGFjaXR5PScwLjcnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDxsaW5lIHgxPSczNDAnIHkxPScxNDgnIHgyPSczMjInIHkyPScxMzAnIHN0cm9rZT0nI2ZmZTU2Nicgc3Ryb2tlLXdpZHRoPSczJyBvcGFjaXR5PScwLjcnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDxsaW5lIHgxPSc0ODAnIHkxPScyMDAnIHgyPSc1MDUnIHkyPScyMDAnIHN0cm9rZT0nI2ZmZTU2Nicgc3Ryb2tlLXdpZHRoPSczJyBvcGFjaXR5PScwLjcnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDxsaW5lIHgxPSczMjAnIHkxPScyMDAnIHgyPScyOTUnIHkyPScyMDAnIHN0cm9rZT0nI2ZmZTU2Nicgc3Ryb2tlLXdpZHRoPSczJyBvcGFjaXR5PScwLjcnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDwhLS0gQmlyZHMgaW4gc2t5IC0tPgogIDxwYXRoIGQ9J00xODAgMTYwIFExOTAgMTUzIDIwMCAxNjAnIHN0cm9rZT0nIzVkNDAzNycgc3Ryb2tlLXdpZHRoPScyJyBmaWxsPSdub25lJy8+CiAgPHBhdGggZD0nTTIxNSAxNDUgUTIyNSAxMzggMjM1IDE0NScgc3Ryb2tlPScjNWQ0MDM3JyBzdHJva2Utd2lkdGg9JzInIGZpbGw9J25vbmUnLz4KICA8cGF0aCBkPSdNNjAwIDE3MCBRNjEwIDE2MyA2MjAgMTcwJyBzdHJva2U9JyM1ZDQwMzcnIHN0cm9rZS13aWR0aD0nMicgZmlsbD0nbm9uZScvPgogIDx0ZXh0IHg9JzQwMCcgeT0nNDMwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScyMicgZmlsbD0nIzRhMmMwYScgdGV4dC1hbmNob3I9J21pZGRsZScgb3BhY2l0eT0nMC45JyBmb250LXN0eWxlPSdpdGFsaWMnPlRoZSBNb3JuaW5nIFJpdHVhbDwvdGV4dD4KPC9zdmc+" alt="Morning routine article" />
+        <span class="article-card-tag">Routines</span>
+      </div>
+      <div class="article-card-body">
+        <h3 class="article-card-title">Design a Morning Ritual That Actually Works</h3>
+        <p class="article-card-excerpt">Forget the 5 AM gurus. Build a morning that matches your biology, not someone else's highlight reel.</p>
+        <div class="article-card-meta">
+          <span>Mar 18, 2026 &nbsp;&middot;&nbsp; 5 min</span>
+          <a class="read-link" href="#" onclick="openArticle('art5',event)">Read &rarr;</a>
+        </div>
+      </div>
+    </a>
+    <a class="article-card" href="#" onclick="openArticle('art6',event)">
+      <div class="article-card-img">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnNicgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwZDJiMWEnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjMWE1YzM2Jy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNiZzYpJy8+CiAgPCEtLSBNb3VudGFpbiBwZWFrIC0tPgogIDxwb2x5Z29uIHBvaW50cz0nNDAwLDgwIDYwMCw0MjAgMjAwLDQyMCcgZmlsbD0nIzJlN2Q1Micgb3BhY2l0eT0nMC43Jy8+CiAgPHBvbHlnb24gcG9pbnRzPSc0MDAsODAgNjAwLDQyMCAyMDAsNDIwJyBmaWxsPSdub25lJyBzdHJva2U9JyM2OWYwYWUnIHN0cm9rZS13aWR0aD0nMicgb3BhY2l0eT0nMC42Jy8+CiAgPCEtLSBTbm93IGNhcCAtLT4KICA8cG9seWdvbiBwb2ludHM9JzQwMCw4MCA0NTUsMjAwIDM0NSwyMDAnIGZpbGw9J3doaXRlJyBvcGFjaXR5PScwLjgnLz4KICA8IS0tIFBhdGggd2luZGluZyB1cCAtLT4KICA8cGF0aCBkPSdNMjIwIDQxMCBRMzAwIDM4MCAzNDAgMzUwIFEzNjAgMzMwIDM4MCAzMDAgUTM5MCAyNzAgMzk1IDI0MCBRMzk4IDIwMCA0MDAgMTYwJyBzdHJva2U9JyNhNWQ2YTcnIHN0cm9rZS13aWR0aD0nMi41JyBzdHJva2UtZGFzaGFycmF5PSc4LDUnIGZpbGw9J25vbmUnIG9wYWNpdHk9JzAuOCcvPgogIDwhLS0gVGlueSBjbGltYmVyIGF0IHRvcCAtLT4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PScxNTUnIHI9JzcnIGZpbGw9JyNmZmUwNjYnLz4KICA8bGluZSB4MT0nNDAwJyB5MT0nMTYyJyB4Mj0nNDAwJyB5Mj0nMTgyJyBzdHJva2U9JyNmZmUwNjYnIHN0cm9rZS13aWR0aD0nMi41Jy8+CiAgPGxpbmUgeDE9JzQwMCcgeTE9JzE2OCcgeDI9JzM5MCcgeTI9JzE3OCcgc3Ryb2tlPScjZmZlMDY2JyBzdHJva2Utd2lkdGg9JzInIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDxsaW5lIHgxPSc0MDAnIHkxPScxNjgnIHgyPSc0MTAnIHkyPScxNzgnIHN0cm9rZT0nI2ZmZTA2Nicgc3Ryb2tlLXdpZHRoPScyJyBzdHJva2UtbGluZWNhcD0ncm91bmQnLz4KICA8bGluZSB4MT0nNDAwJyB5MT0nMTgyJyB4Mj0nMzkzJyB5Mj0nMTk2JyBzdHJva2U9JyNmZmUwNjYnIHN0cm9rZS13aWR0aD0nMicgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJy8+CiAgPGxpbmUgeDE9JzQwMCcgeTE9JzE4MicgeDI9JzQwNycgeTI9JzE5Nicgc3Ryb2tlPScjZmZlMDY2JyBzdHJva2Utd2lkdGg9JzInIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDwhLS0gU3RhcnMgLS0+CiAgPGNpcmNsZSBjeD0nMTAwJyBjeT0nMTAwJyByPScyJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC42Jy8+CiAgPGNpcmNsZSBjeD0nNzAwJyBjeT0nODAnIHI9JzEuNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuNScvPgogIDxjaXJjbGUgY3g9JzE1MCcgY3k9JzIwMCcgcj0nMScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuNCcvPgogIDxjaXJjbGUgY3g9JzY4MCcgY3k9JzE4MCcgcj0nMS41JyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC41Jy8+CiAgPHRleHQgeD0nNDAwJyB5PSc0NjAnIGZvbnQtZmFtaWx5PSdHZW9yZ2lhLHNlcmlmJyBmb250LXNpemU9JzIyJyBmaWxsPSd3aGl0ZScgdGV4dC1hbmNob3I9J21pZGRsZScgb3BhY2l0eT0nMC45JyBmb250LXN0eWxlPSdpdGFsaWMnPlNldHRpbmcgUG93ZXJmdWwgR29hbHM8L3RleHQ+Cjwvc3ZnPg==" alt="Goals article" />
+        <span class="article-card-tag">Goals</span>
+      </div>
+      <div class="article-card-body">
+        <h3 class="article-card-title">Stop Setting Goals. Start Building Systems</h3>
+        <p class="article-card-excerpt">Goals tell you where you want to go. Systems determine whether you actually get there — here is the difference.</p>
+        <div class="article-card-meta">
+          <span>Mar 12, 2026 &nbsp;&middot;&nbsp; 7 min</span>
+          <a class="read-link" href="#" onclick="openArticle('art6',event)">Read &rarr;</a>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ ABOUT ═══ -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-img reveal">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNjAwJyB2aWV3Qm94PScwIDAgODAwIDYwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnYScgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYTEyMDgnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjM2QyYjBhJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSdhdXJhJyBjeD0nNDAlJyBjeT0nMzUlJyByPSc0NSUnPgogICAgICA8c3RvcCBvZmZzZXQ9JzAlJyBzdG9wLWNvbG9yPScjZDRhOTRhJyBzdG9wLW9wYWNpdHk9JzAuMjUnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjYzQ1MjJhJyBzdG9wLW9wYWNpdHk9JzAnLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSc4MDAnIGhlaWdodD0nNjAwJyBmaWxsPSd1cmwoI2JnYSknLz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzYwMCcgZmlsbD0ndXJsKCNhdXJhKScvPgogIDwhLS0gRGVzayB3aXRoIGJvb2sgLS0+CiAgPHJlY3QgeD0nMTUwJyB5PSczODAnIHdpZHRoPSc1MDAnIGhlaWdodD0nMTUnIHJ4PSc0JyBmaWxsPScjNWEzYTEwJyBvcGFjaXR5PScwLjgnLz4KICA8IS0tIE9wZW4gYm9vayAtLT4KICA8cGF0aCBkPSdNMjYwIDMxMCBRMzIwIDI5MCAzODAgMzEwIEwzODAgMzgwIFEzMjAgMzYwIDI2MCAzODAgWicgZmlsbD0nI2Y1ZjBlOCcgb3BhY2l0eT0nMC45Jy8+CiAgPHBhdGggZD0nTTM4MCAzMTAgUTQ0MCAyOTAgNTAwIDMxMCBMNTAwIDM4MCBRNDQwIDM2MCAzODAgMzgwIFonIGZpbGw9JyNmMGViZTAnIG9wYWNpdHk9JzAuODUnLz4KICA8IS0tIEJvb2sgbGluZXMgLS0+CiAgPGxpbmUgeDE9JzI3NScgeTE9JzMyNScgeDI9JzM2NScgeTI9JzMxNScgc3Ryb2tlPScjYmJhJyBzdHJva2Utd2lkdGg9JzEnIG9wYWNpdHk9JzAuNScvPgogIDxsaW5lIHgxPScyNzUnIHkxPSczMzgnIHgyPSczNjUnIHkyPSczMjgnIHN0cm9rZT0nI2JiYScgc3Ryb2tlLXdpZHRoPScxJyBvcGFjaXR5PScwLjUnLz4KICA8bGluZSB4MT0nMjc1JyB5MT0nMzUxJyB4Mj0nMzY1JyB5Mj0nMzQxJyBzdHJva2U9JyNiYmEnIHN0cm9rZS13aWR0aD0nMScgb3BhY2l0eT0nMC41Jy8+CiAgPGxpbmUgeDE9JzM5NScgeTE9JzMxNScgeDI9JzQ4NScgeTI9JzMyNScgc3Ryb2tlPScjYmJhJyBzdHJva2Utd2lkdGg9JzEnIG9wYWNpdHk9JzAuNScvPgogIDxsaW5lIHgxPSczOTUnIHkxPSczMjgnIHgyPSc0ODUnIHkyPSczMzgnIHN0cm9rZT0nI2JiYScgc3Ryb2tlLXdpZHRoPScxJyBvcGFjaXR5PScwLjUnLz4KICA8bGluZSB4MT0nMzk1JyB5MT0nMzQxJyB4Mj0nNDg1JyB5Mj0nMzUxJyBzdHJva2U9JyNiYmEnIHN0cm9rZS13aWR0aD0nMScgb3BhY2l0eT0nMC41Jy8+CiAgPCEtLSBDYW5kbGUgLS0+CiAgPHJlY3QgeD0nNTQwJyB5PSczMzAnIHdpZHRoPScxNCcgaGVpZ2h0PSc1MCcgcng9JzMnIGZpbGw9JyNmNWU2YzgnIG9wYWNpdHk9JzAuOScvPgogIDxlbGxpcHNlIGN4PSc1NDcnIGN5PSczMjYnIHJ4PSc3JyByeT0nNScgZmlsbD0nI2ZmZDc0MCcgb3BhY2l0eT0nMC45Jy8+CiAgPHBhdGggZD0nTTU0NyAzMTggUTU1MiAzMDggNTQ3IDMwMCBRNTQyIDMwOCA1NDcgMzE4JyBmaWxsPScjZmY4ZjAwJyBvcGFjaXR5PScwLjknLz4KICA8IS0tIFdhcm0gZ2xvdyBmcm9tIGNhbmRsZSAtLT4KICA8Y2lyY2xlIGN4PSc1NDcnIGN5PSczMTUnIHI9JzQwJyBmaWxsPScjZmZhNzI2JyBvcGFjaXR5PScwLjA4Jy8+CiAgPCEtLSBQbGFudCAtLT4KICA8cmVjdCB4PScyMDAnIHk9JzMzMCcgd2lkdGg9JzEwJyBoZWlnaHQ9JzUwJyByeD0nMycgZmlsbD0nIzVkNDAzNycgb3BhY2l0eT0nMC44Jy8+CiAgPGVsbGlwc2UgY3g9JzE5NScgY3k9JzMyMCcgcng9JzIwJyByeT0nMjgnIGZpbGw9JyMzODhlM2MnIG9wYWNpdHk9JzAuOCcvPgogIDxlbGxpcHNlIGN4PScyMTUnIGN5PSczMTUnIHJ4PScxOCcgcnk9JzI1JyBmaWxsPScjNDNhMDQ3JyBvcGFjaXR5PScwLjgnLz4KICA8ZWxsaXBzZSBjeD0nMjA1JyBjeT0nMzAwJyByeD0nMTUnIHJ5PScyMicgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC45Jy8+CiAgPHRleHQgeD0nNDAwJyB5PSc1MzAnIGZvbnQtZmFtaWx5PSdHZW9yZ2lhLHNlcmlmJyBmb250LXNpemU9JzI0JyBmaWxsPScjZDRhOTRhJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBvcGFjaXR5PScwLjknIGZvbnQtc3R5bGU9J2l0YWxpYyc+V2hlcmUgR3Jvd3RoIEJlZ2luczwvdGV4dD4KPC9zdmc+" alt="Quiet study space for growth" />
+      <div class="about-badge">
+        <span class="about-badge-num">7+</span>
+        <span class="about-badge-label">Years of Research</span>
+      </div>
+    </div>
+    <div class="about-text reveal">
+      <span class="sec-kicker">Our Mission</span>
+      <div class="gold-bar"></div>
+      <h2 class="sec-title">Growth Without <em>Pretence</em></h2>
+      <p>Ascend Within was born from a simple frustration: most self-help content is either superficial fluff or unattainable ideology. Real growth is quieter, messier, and far more interesting.</p>
+      <p>We synthesise research from psychology, neuroscience, and philosophy into honest, actionable writing. No hustle porn. No overnight transformations. Just the slow, dignified work of becoming.</p>
+      <p>Every article is written, edited, and fact-checked with care — because you deserve better than recycled motivational quotes.</p>
+      <div class="about-values">
+        <div class="value-item">
+          <div class="value-title">Evidence-Based</div>
+          <div class="value-desc">Grounded in peer-reviewed research, not viral anecdote</div>
+        </div>
+        <div class="value-item">
+          <div class="value-title">Radical Honesty</div>
+          <div class="value-desc">We tell you what works, and what does not</div>
+        </div>
+        <div class="value-item">
+          <div class="value-title">Long-term Thinking</div>
+          <div class="value-desc">We focus on compounding, not quick fixes</div>
+        </div>
+        <div class="value-item">
+          <div class="value-title">Human First</div>
+          <div class="value-desc">Growth means nothing without wellbeing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<section id="testimonials">
+  <div class="text-center reveal">
+    <span class="sec-kicker">Reader Stories</span>
+    <div class="gold-bar"></div>
+    <h2 class="sec-title">Lives <em>Transformed</em></h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="testi-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+      <p class="testi-text">"The habits article changed how I approach my entire day. I stopped trying to overhaul everything overnight and started with one keystone habit. Six months later, I am a different person."</p>
+      <div class="testi-author">
+        <div class="testi-avatar"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc0MDAnIGhlaWdodD0nNDAwJyB2aWV3Qm94PScwIDAgNDAwIDQwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JndCcgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyNjNDdhMmEnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjZThiODZkJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzQwMCcgZmlsbD0ndXJsKCNiZ3QpJy8+CiAgPGNpcmNsZSBjeD0nMjAwJyBjeT0nMTU1JyByPSc2MCcgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8Y2lyY2xlIGN4PScyMDAnIGN5PScxNTUnIHI9JzUwJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC4yJy8+CiAgPCEtLSBGYWNlIG91dGxpbmUgLS0+CiAgPGVsbGlwc2UgY3g9JzIwMCcgY3k9JzE0OCcgcng9JzMyJyByeT0nMzgnIGZpbGw9JyNmZmYzZTAnIG9wYWNpdHk9JzAuOScvPgogIDwhLS0gSGFpciAtLT4KICA8ZWxsaXBzZSBjeD0nMjAwJyBjeT0nMTIyJyByeD0nMzQnIHJ5PScxOCcgZmlsbD0nIzRhMmMwYScgb3BhY2l0eT0nMC44NScvPgogIDwhLS0gU2hvdWxkZXJzIC0tPgogIDxwYXRoIGQ9J00xNDAgMjMwIFExNzAgMjEwIDIwMCAyMTUgUTIzMCAyMTAgMjYwIDIzMCBMMjYwIDI2MCBMMTQwIDI2MCBaJyBmaWxsPScjYmY4MDQwJyBvcGFjaXR5PScwLjcnLz4KICA8IS0tIEV5ZXMgLS0+CiAgPGVsbGlwc2UgY3g9JzE4OCcgY3k9JzE0OCcgcng9JzUnIHJ5PSc2JyBmaWxsPScjNGEyYzBhJy8+CiAgPGVsbGlwc2UgY3g9JzIxMicgY3k9JzE0OCcgcng9JzUnIHJ5PSc2JyBmaWxsPScjNGEyYzBhJy8+CiAgPCEtLSBTbWlsZSAtLT4KICA8cGF0aCBkPSdNMTg4IDE2OCBRMjAwIDE3OCAyMTIgMTY4JyBzdHJva2U9JyM3YTRhMWEnIHN0cm9rZS13aWR0aD0nMicgZmlsbD0nbm9uZScvPgo8L3N2Zz4=" alt="Sarah K." /></div>
+        <div>
+          <div class="testi-name">Sarah K.</div>
+          <div class="testi-role">Product Designer, Singapore</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="testi-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+      <p class="testi-text">"I have read every self-help book on the shelf. Ascend Within is the first platform that treats me like an intelligent adult. The writing is beautiful and the advice is actually useful."</p>
+      <div class="testi-author">
+        <div class="testi-avatar"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc0MDAnIGhlaWdodD0nNDAwJyB2aWV3Qm94PScwIDAgNDAwIDQwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JndDInIHgxPScwJScgeTE9JzAlJyB4Mj0nMTAwJScgeTI9JzEwMCUnPgogICAgICA8c3RvcCBvZmZzZXQ9JzAlJyBzdG9wLWNvbG9yPScjMmE0YTZiJy8+CiAgICAgIDxzdG9wIG9mZnNldD0nMTAwJScgc3RvcC1jb2xvcj0nIzRhN2E5YicvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzQwMCcgaGVpZ2h0PSc0MDAnIGZpbGw9J3VybCgjYmd0MiknLz4KICA8Y2lyY2xlIGN4PScyMDAnIGN5PScxNTUnIHI9JzYwJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC4xNScvPgogIDxlbGxpcHNlIGN4PScyMDAnIGN5PScxNDgnIHJ4PSczMicgcnk9JzM4JyBmaWxsPScjZThkNWIwJyBvcGFjaXR5PScwLjknLz4KICA8ZWxsaXBzZSBjeD0nMjAwJyBjeT0nMTIwJyByeD0nMzYnIHJ5PScyMicgZmlsbD0nIzJhMWEwOCcgb3BhY2l0eT0nMC44NScvPgogIDxwYXRoIGQ9J00xNDAgMjMwIFExNzAgMjEwIDIwMCAyMTUgUTIzMCAyMTAgMjYwIDIzMCBMMjYwIDI2MCBMMTQwIDI2MCBaJyBmaWxsPScjM2E2YTliJyBvcGFjaXR5PScwLjcnLz4KICA8ZWxsaXBzZSBjeD0nMTg4JyBjeT0nMTQ4JyByeD0nNScgcnk9JzYnIGZpbGw9JyMyYTFhMDgnLz4KICA8ZWxsaXBzZSBjeD0nMjEyJyBjeT0nMTQ4JyByeD0nNScgcnk9JzYnIGZpbGw9JyMyYTFhMDgnLz4KICA8cGF0aCBkPSdNMTg4IDE2OCBRMjAwIDE3OCAyMTIgMTY4JyBzdHJva2U9JyM1YTNhMTgnIHN0cm9rZS13aWR0aD0nMicgZmlsbD0nbm9uZScvPgo8L3N2Zz4=" alt="Marcus T." /></div>
+        <div>
+          <div class="testi-name">Marcus T.</div>
+          <div class="testi-role">Software Engineer, Kuala Lumpur</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="testi-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+      <p class="testi-text">"The resilience piece hit me at exactly the right moment. After losing my job, these words reminded me that setbacks are not the end of the story. They are the beginning of a better one."</p>
+      <div class="testi-author">
+        <div class="testi-avatar"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc0MDAnIGhlaWdodD0nNDAwJyB2aWV3Qm94PScwIDAgNDAwIDQwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JndDMnIHgxPScwJScgeTE9JzAlJyB4Mj0nMTAwJScgeTI9JzEwMCUnPgogICAgICA8c3RvcCBvZmZzZXQ9JzAlJyBzdG9wLWNvbG9yPScjMmEzYTFhJy8+CiAgICAgIDxzdG9wIG9mZnNldD0nMTAwJScgc3RvcC1jb2xvcj0nIzRhNmEzYScvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzQwMCcgaGVpZ2h0PSc0MDAnIGZpbGw9J3VybCgjYmd0MyknLz4KICA8Y2lyY2xlIGN4PScyMDAnIGN5PScxNTUnIHI9JzYwJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC4xNScvPgogIDxlbGxpcHNlIGN4PScyMDAnIGN5PScxNDgnIHJ4PSczMicgcnk9JzM4JyBmaWxsPScjZjVkZGIwJyBvcGFjaXR5PScwLjknLz4KICA8ZWxsaXBzZSBjeD0nMjAwJyBjeT0nMTE4JyByeD0nMzgnIHJ5PScyNicgZmlsbD0nIzZhM2EwOCcgb3BhY2l0eT0nMC44NScvPgogIDxwYXRoIGQ9J00xNDAgMjMwIFExNzAgMjEwIDIwMCAyMTUgUTIzMCAyMTAgMjYwIDIzMCBMMjYwIDI2MCBMMTQwIDI2MCBaJyBmaWxsPScjM2E2YTNhJyBvcGFjaXR5PScwLjcnLz4KICA8ZWxsaXBzZSBjeD0nMTg4JyBjeT0nMTQ4JyByeD0nNScgcnk9JzYnIGZpbGw9JyMzYTIwMDgnLz4KICA8ZWxsaXBzZSBjeD0nMjEyJyBjeT0nMTQ4JyByeD0nNScgcnk9JzYnIGZpbGw9JyMzYTIwMDgnLz4KICA8cGF0aCBkPSdNMTg4IDE2OCBRMjAwIDE3OCAyMTIgMTY4JyBzdHJva2U9JyM2YTQwMTgnIHN0cm9rZS13aWR0aD0nMicgZmlsbD0nbm9uZScvPgo8L3N2Zz4=" alt="Aisha R." /></div>
+        <div>
+          <div class="testi-name">Aisha R.</div>
+          <div class="testi-role">Entrepreneur, Johor Bahru</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ NEWSLETTER ═══ -->
+<section id="newsletter">
+  <div class="newsletter-bg">
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjAwJyBoZWlnaHQ9JzQwMCcgdmlld0JveD0nMCAwIDEyMDAgNDAwJz4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0nYmduJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgICAgPHN0b3Agb2Zmc2V0PScwJScgc3RvcC1jb2xvcj0nIzFhMGEwMCcvPgogICAgICA8c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyMzYTFhMDAnLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9J2duJyBjeD0nNTAlJyBjeT0nNTAlJyByPSc1MCUnPgogICAgICA8c3RvcCBvZmZzZXQ9JzAlJyBzdG9wLWNvbG9yPScjZDRhOTRhJyBzdG9wLW9wYWNpdHk9JzAuMicvPgogICAgICA8c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyNjNDUyMmEnIHN0b3Atb3BhY2l0eT0nMCcvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzEyMDAnIGhlaWdodD0nNDAwJyBmaWxsPSd1cmwoI2JnbiknLz4KICA8cmVjdCB3aWR0aD0nMTIwMCcgaGVpZ2h0PSc0MDAnIGZpbGw9J3VybCgjZ24pJy8+CiAgPCEtLSBQYXJ0aWNsZSBkb3RzIC0tPgogIDxjaXJjbGUgY3g9JzEwMCcgY3k9JzgwJyByPScyJyBmaWxsPScjZDRhOTRhJyBvcGFjaXR5PScwLjQnLz4KICA8Y2lyY2xlIGN4PScyNTAnIGN5PScyMDAnIHI9JzEuNScgZmlsbD0nI2Q0YTk0YScgb3BhY2l0eT0nMC4zJy8+CiAgPGNpcmNsZSBjeD0nOTAwJyBjeT0nMTAwJyByPScyJyBmaWxsPScjZDRhOTRhJyBvcGFjaXR5PScwLjQnLz4KICA8Y2lyY2xlIGN4PScxMDUwJyBjeT0nMjgwJyByPScxLjUnIGZpbGw9JyNkNGE5NGEnIG9wYWNpdHk9JzAuMycvPgogIDxjaXJjbGUgY3g9JzYwMCcgY3k9JzUwJyByPScxJyBmaWxsPScjZDRhOTRhJyBvcGFjaXR5PScwLjMnLz4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PSczMjAnIHI9JzInIGZpbGw9JyNjNDUyMmEnIG9wYWNpdHk9JzAuMycvPgogIDxjaXJjbGUgY3g9JzgwMCcgY3k9JzM0MCcgcj0nMS41JyBmaWxsPScjYzQ1MjJhJyBvcGFjaXR5PScwLjMnLz4KICA8IS0tIFRoaW4gaG9yaXpvbnRhbCBsaW5lcyBmb3IgdGV4dHVyZSAtLT4KICA8bGluZSB4MT0nMCcgeTE9JzEzMycgeDI9JzEyMDAnIHkyPScxMzMnIHN0cm9rZT0nI2Q0YTk0YScgc3Ryb2tlLXdpZHRoPScwLjUnIG9wYWNpdHk9JzAuMDYnLz4KICA8bGluZSB4MT0nMCcgeTE9JzI2NicgeDI9JzEyMDAnIHkyPScyNjYnIHN0cm9rZT0nI2Q0YTk0YScgc3Ryb2tlLXdpZHRoPScwLjUnIG9wYWNpdHk9JzAuMDYnLz4KPC9zdmc+" alt="Newsletter background" />
+  </div>
+  <div class="newsletter-overlay"></div>
+  <div class="newsletter-inner reveal">
+    <span class="sec-kicker" style="color:var(--gold-light)">Weekly Wisdom</span>
+    <div class="gold-bar" style="margin:0 auto 1.4rem"></div>
+    <h2 class="sec-title" style="color:white">One Email. Every Sunday.<br><em>Worth the Read.</em></h2>
+    <p>No noise, no spam. Just one thoughtfully written piece to start your week with clarity and intention. Join 14,000+ readers.</p>
+    <div class="newsletter-form">
+      <input type="email" id="nlEmail" placeholder="your@email.com" />
+      <button onclick="handleNewsletterSubmit()">Subscribe</button>
+    </div>
+    <p class="newsletter-note" id="nlFeedback">Free forever. Unsubscribe any time.</p>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+<section id="contact">
+  <div class="contact-grid">
+    <div class="contact-info reveal">
+      <span class="sec-kicker">Let's Connect</span>
+      <div class="gold-bar"></div>
+      <h2 class="sec-title">Start a <em>Conversation</em></h2>
+      <p>Whether you have a story to pitch, a question about our work, or simply want to say hello — we read every message and reply within two days.</p>
+      <div class="contact-item">
+        <span class="contact-label">Email</span>
+        <span class="contact-value">hello@ascendwithin.com</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-label">For Collaborations</span>
+        <span class="contact-value">partners@ascendwithin.com</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-label">Response Time</span>
+        <span class="contact-value">Within 48 hours</span>
+      </div>
+    </div>
+    <div class="form-box reveal">
+      <div class="success-msg" id="successMsg">Your message has been sent. We will be in touch soon.</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="fname" placeholder="Ada" />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="lname" placeholder="Lovelace" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="ada@email.com" />
+      </div>
+      <div class="form-group">
+        <label>Topic</label>
+        <select id="topic">
+          <option value="">Select a topic</option>
+          <option>Article Pitch</option>
+          <option>Partnership</option>
+          <option>Feedback</option>
+          <option>General Enquiry</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea id="message" placeholder="Tell us what is on your mind..."></textarea>
+      </div>
+      <button class="form-submit" onclick="handleContactSubmit(event)">Send Message</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#hero" class="nav-logo"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNjAnIGhlaWdodD0nNDgnIHZpZXdCb3g9JzAgMCAxNjAgNDgnPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSdsZycgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyNlOGI4NmQnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjYzQ3MzJhJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PScyNCcgY3k9JzI0JyByPScyMCcgZmlsbD0ndXJsKCNsZyknLz4KICA8cGF0aCBkPSdNMjQgMTAgTDI0IDI0IEwzNCAzMCcgc3Ryb2tlPSd3aGl0ZScgc3Ryb2tlLXdpZHRoPScyLjUnIGZpbGw9J25vbmUnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcgc3Ryb2tlLWxpbmVqb2luPSdyb3VuZCcvPgogIDxwYXRoIGQ9J00xOCAyNCBRMjQgMTYgMzAgMjQgUTI0IDMyIDE4IDI0WicgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuOScvPgogIDx0ZXh0IHg9JzUyJyB5PSczMCcgZm9udC1mYW1pbHk9J0dlb3JnaWEsc2VyaWYnIGZvbnQtc2l6ZT0nMTgnIGZvbnQtd2VpZ2h0PSdib2xkJyBmaWxsPScjMWExMjA4Jz5BU0NFTkQ8L3RleHQ+CiAgPHRleHQgeD0nNTInIHk9JzQyJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPSc5JyBmaWxsPScjN2E2MjUwJyBsZXR0ZXItc3BhY2luZz0nMyc+V0lUSElOPC90ZXh0Pgo8L3N2Zz4=" alt="Ascend Within" /></a>
+      <p>Practical wisdom for the long game. Growing intentionally, one day at a time.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Read</h4>
+      <ul>
+        <li><a href="#articles">All Articles</a></li>
+        <li><a href="#" onclick="openArticle('art1',event)">Mindset</a></li>
+        <li><a href="#" onclick="openArticle('art2',event)">Habits</a></li>
+        <li><a href="#" onclick="openArticle('art3',event)">Focus</a></li>
+        <li><a href="#" onclick="openArticle('art5',event)">Routines</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#testimonials">Reader Stories</a></li>
+        <li><a href="#newsletter">Newsletter</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+        <li><a href="#">Cookie Settings</a></li>
+        <li><a href="#">Disclaimer</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Ascend Within. All rights reserved.</span>
+    <div>
+      <a href="#hero">Back to Top</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ ARTICLE MODALS ═══ -->
+<div id="articleOverlay" class="page-overlay">
+  <button class="overlay-close" onclick="closeArticle()">&#x2715;</button>
+  <div class="page-overlay-inner" id="articleContent"></div>
+</div>
+
+<!-- ═══ JS ═══ -->
+<script>
+const ARTICLES = {
+  art1:{tag:"Mindset",title:"Rewiring Your Mind: The Science of a Growth Mindset",date:"April 10, 2026",read:"9 min read",img:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnMScgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwZDIxMzcnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjMWE0YTZiJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNiZzEpJy8+CiAgPCEtLSBBYnN0cmFjdCBicmFpbiB3YXZlcyAtLT4KICA8cGF0aCBkPSdNMTAwIDI1MCBRMjAwIDE1MCAzMDAgMjUwIFE0MDAgMzUwIDUwMCAyNTAgUTYwMCAxNTAgNzAwIDI1MCcgc3Ryb2tlPScjNGZjM2Y3JyBzdHJva2Utd2lkdGg9JzMnIGZpbGw9J25vbmUnIG9wYWNpdHk9JzAuNicvPgogIDxwYXRoIGQ9J00xMDAgMjgwIFEyMDAgMTgwIDMwMCAyODAgUTQwMCAzODAgNTAwIDI4MCBRNjAwIDE4MCA3MDAgMjgwJyBzdHJva2U9JyM4MWQ0ZmEnIHN0cm9rZS13aWR0aD0nMicgZmlsbD0nbm9uZScgb3BhY2l0eT0nMC40Jy8+CiAgPHBhdGggZD0nTTEwMCAyMjAgUTIwMCAxMjAgMzAwIDIyMCBRNDAwIDMyMCA1MDAgMjIwIFE2MDAgMTIwIDcwMCAyMjAnIHN0cm9rZT0nIzI5YjZmNicgc3Ryb2tlLXdpZHRoPScxLjUnIGZpbGw9J25vbmUnIG9wYWNpdHk9JzAuMycvPgogIDwhLS0gQ2VudHJhbCBjaXJjbGUgLS0+CiAgPGNpcmNsZSBjeD0nNDAwJyBjeT0nMjUwJyByPSc4MCcgZmlsbD0nbm9uZScgc3Ryb2tlPScjNGZjM2Y3JyBzdHJva2Utd2lkdGg9JzInIG9wYWNpdHk9JzAuNScvPgogIDxjaXJjbGUgY3g9JzQwMCcgY3k9JzI1MCcgcj0nNTUnIGZpbGw9JyMxNTY1YzAnIG9wYWNpdHk9JzAuNicvPgogIDxjaXJjbGUgY3g9JzQwMCcgY3k9JzI1MCcgcj0nMzAnIGZpbGw9JyMxZTg4ZTUnIG9wYWNpdHk9JzAuOCcvPgogIDwhLS0gSGVhZCBzaWxob3VldHRlIG91dGxpbmUgLS0+CiAgPHBhdGggZD0nTTM2MCAyMDAgUTM0MCAyMDAgMzM1IDIyMCBRMzMwIDI0MCAzNDAgMjYwIFEzNTAgMjg1IDM3MCAyOTAgUTM4MCAzMTAgMzgwIDMzMCBMNDIwIDMzMCBRNDIwIDMxMCA0MzAgMjkwIFE0NTAgMjg1IDQ2MCAyNjAgUTQ3MCAyNDAgNDY1IDIyMCBRNDYwIDIwMCA0NDAgMjAwIFonIGZpbGw9J25vbmUnIHN0cm9rZT0nd2hpdGUnIHN0cm9rZS13aWR0aD0nMicgb3BhY2l0eT0nMC43Jy8+CiAgPCEtLSBMaWdodCByYXlzIC0tPgogIDxsaW5lIHgxPSc0MDAnIHkxPScxMzAnIHgyPSc0MDAnIHkyPScxMDAnIHN0cm9rZT0nI2ZmZTA2Nicgc3Ryb2tlLXdpZHRoPScyJyBvcGFjaXR5PScwLjYnLz4KICA8bGluZSB4MT0nNDUwJyB5MT0nMTQ1JyB4Mj0nNDcwJyB5Mj0nMTIwJyBzdHJva2U9JyNmZmUwNjYnIHN0cm9rZS13aWR0aD0nMS41JyBvcGFjaXR5PScwLjQnLz4KICA8bGluZSB4MT0nMzUwJyB5MT0nMTQ1JyB4Mj0nMzMwJyB5Mj0nMTIwJyBzdHJva2U9JyNmZmUwNjYnIHN0cm9rZS13aWR0aD0nMS41JyBvcGFjaXR5PScwLjQnLz4KICA8dGV4dCB4PSc0MDAnIHk9JzQzMCcgZm9udC1mYW1pbHk9J0dlb3JnaWEsc2VyaWYnIGZvbnQtc2l6ZT0nMjInIGZpbGw9J3doaXRlJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBvcGFjaXR5PScwLjknIGZvbnQtc3R5bGU9J2l0YWxpYyc+VGhlIFBvd2VyIG9mIE1pbmRzZXQ8L3RleHQ+Cjwvc3ZnPg==",
+    body:`<p>Carol Dweck spent decades studying why some people flourish in the face of challenge while others wilt. Her conclusion was elegant and unsettling in equal measure: it is not talent that determines success. It is what you believe about talent.</p>
+    <p>The <em>fixed mindset</em> assumes your qualities are carved in stone. The <em>growth mindset</em> understands that your most basic abilities can be developed through dedication and hard work.</p>
+    <blockquote>Becoming is better than being. The fixed mindset does not allow people the luxury of becoming. They have to already be.</blockquote>
+    <h2>The Neuroscience Underneath</h2>
+    <p>Every time you learn something new, your neurons form new connections. The brain physically changes in response to challenge — a process called neuroplasticity. When you push through difficulty instead of retreating from it, you are literally reshaping the architecture of your mind.</p>
+    <p>Studies at Stanford show that students who were taught about neuroplasticity — that intelligence is not fixed — dramatically outperformed peers who were not. The belief changed the biology.</p>
+    <h2>How to Begin the Rewire</h2>
+    <p>The first step is noticing your inner voice when you encounter failure. Does it say <em>I am not good at this</em> — or <em>I am not good at this yet</em>? That single word, <em>yet</em>, is a portal. It acknowledges your current state without foreclosing your future.</p>
+    <p>Second, choose difficulty deliberately. Seek out the tasks that sit just beyond your current competence — not so far that they break you, but far enough to stretch you. This is the zone where growth lives.</p>
+    <p>Third, honour effort over outcome. Praise yourself and others not for being smart, but for working hard, trying new strategies, and persisting. You are training a reflex, and reflexes take time.</p>
+    <h2>The Long Game</h2>
+    <p>A growth mindset is not a technique you apply once. It is a philosophy you practice daily, in small moments — when you receive criticism, when a project fails, when someone outperforms you. Each of those moments is an invitation. The question is which door you choose to open.</p>`},
+  art2:{tag:"Habits",title:"The 21-Day Myth and What Actually Makes Habits Stick",date:"April 6, 2026",read:"7 min read",img:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnMicgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYjNhMmEnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjMmU2YjQ1Jy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNiZzIpJy8+CiAgPCEtLSBDYWxlbmRhciBncmlkIC0tPgogIDxyZWN0IHg9JzE4MCcgeT0nMTIwJyB3aWR0aD0nNDQwJyBoZWlnaHQ9JzI2MCcgcng9JzEyJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC4wOCcvPgogIDwhLS0gRGF5IGJsb2NrcyDigJQgaGFiaXQgdHJhY2tlciBzdHlsZSAtLT4KICA8cmVjdCB4PScyMTAnIHk9JzE1MCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzI1OCcgeT0nMTUwJyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nMzA2JyB5PScxNTAnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM4MWM3ODQnIG9wYWNpdHk9JzAuNicvPgogIDxyZWN0IHg9JzM1NCcgeT0nMTUwJyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nNDAyJyB5PScxNTAnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSc0NTAnIHk9JzE1MCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8cmVjdCB4PSc0OTgnIHk9JzE1MCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzU0NicgeT0nMTUwJyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nMjEwJyB5PScxOTgnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PScyNTgnIHk9JzE5OCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8cmVjdCB4PSczMDYnIHk9JzE5OCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzM1NCcgeT0nMTk4JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nNDAyJyB5PScxOTgnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM2NmJiNmEnIG9wYWNpdHk9JzAuNycvPgogIDxyZWN0IHg9JzQ1MCcgeT0nMTk4JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nNDk4JyB5PScxOTgnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSc1NDYnIHk9JzE5OCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8cmVjdCB4PScyMTAnIHk9JzI0Nicgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzI1OCcgeT0nMjQ2JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nMzA2JyB5PScyNDYnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSczNTQnIHk9JzI0Nicgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8cmVjdCB4PSc0MDInIHk9JzI0Nicgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzQ1MCcgeT0nMjQ2JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjODFjNzg0JyBvcGFjaXR5PScwLjY1Jy8+CiAgPHJlY3QgeD0nNDk4JyB5PScyNDYnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSc1NDYnIHk9JzI0Nicgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzIxMCcgeT0nMjk0JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC4xNScvPgogIDxyZWN0IHg9JzI1OCcgeT0nMjk0JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nMzA2JyB5PScyOTQnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSczNTQnIHk9JzI5NCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDxyZWN0IHg9JzQwMicgeT0nMjk0JyB3aWR0aD0nMzYnIGhlaWdodD0nMzYnIHJ4PSc1JyBmaWxsPScjNGNhZjUwJyBvcGFjaXR5PScwLjg1Jy8+CiAgPHJlY3QgeD0nNDUwJyB5PScyOTQnIHdpZHRoPSczNicgaGVpZ2h0PSczNicgcng9JzUnIGZpbGw9JyM0Y2FmNTAnIG9wYWNpdHk9JzAuODUnLz4KICA8cmVjdCB4PSc0OTgnIHk9JzI5NCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTUnLz4KICA8cmVjdCB4PSc1NDYnIHk9JzI5NCcgd2lkdGg9JzM2JyBoZWlnaHQ9JzM2JyByeD0nNScgZmlsbD0nIzRjYWY1MCcgb3BhY2l0eT0nMC44NScvPgogIDx0ZXh0IHg9JzQwMCcgeT0nNDMwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScyMicgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIG9wYWNpdHk9JzAuOScgZm9udC1zdHlsZT0naXRhbGljJz5CdWlsZGluZyBMYXN0aW5nIEhhYml0czwvdGV4dD4KPC9zdmc+",
+    body:`<p>In 1960, plastic surgeon Maxwell Maltz noticed that his patients took roughly 21 days to get used to their new faces. He wrote about it casually in a book. Somehow, that footnote became a global doctrine: it takes 21 days to form a habit. It does not.</p>
+    <p>A 2010 study by Phillippa Lally at University College London tracked 96 people forming new habits over 12 weeks. The average time for a behaviour to become automatic was 66 days. The range was 18 to 254 days. The 21-day figure was not even a statistical outlier — it was simply wrong.</p>
+    <blockquote>Habits are not formed by time. They are formed by repetition — and the conditions that make repetition sustainable.</blockquote>
+    <h2>The Three Elements That Actually Work</h2>
+    <p><strong>1. Context anchoring.</strong> Habits form fastest when they are attached to a stable cue — a time, place, or preceding action. "I will meditate after I pour my morning coffee" is more powerful than "I will meditate every morning" because it gives your brain a reliable trigger.</p>
+    <p><strong>2. Friction reduction.</strong> Every barrier between you and the behaviour makes repetition less likely. Lay your workout clothes out the night before. Keep the journal on your desk, not in a drawer. Remove as many decision points as possible.</p>
+    <p><strong>3. Identity alignment.</strong> The most durable habits are those that align with who you believe you are. "I am a person who exercises" is a more resilient foundation than "I want to lose weight." Goals end. Identities persist.</p>
+    <h2>The Patience Principle</h2>
+    <p>Expecting a new behaviour to feel automatic in three weeks sets you up for unnecessary guilt. Some habits will click in two weeks. Others will take six months. What matters is not the speed of automaticity — it is showing up consistently while the neural pathways are still forming.</p>`},
+  art3:{tag:"Focus",title:"Deep Work in a Distracted World",date:"March 30, 2026",read:"6 min read",img:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnMycgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMyYTFhMDAnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjNWEzYTAwJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSdzcG90bGlnaHQnIGN4PSc1MCUnIGN5PSc1MCUnIHI9JzQwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyNmZmUwNjYnIHN0b3Atb3BhY2l0eT0nMC4zJy8+CiAgICAgIDxzdG9wIG9mZnNldD0nMTAwJScgc3RvcC1jb2xvcj0nI2M0N2EwMCcgc3RvcC1vcGFjaXR5PScwJy8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNiZzMpJy8+CiAgPHJlY3Qgd2lkdGg9JzgwMCcgaGVpZ2h0PSc1MDAnIGZpbGw9J3VybCgjc3BvdGxpZ2h0KScvPgogIDwhLS0gQ29uY2VudHJpYyByaW5ncyAtIHRhcmdldCAtLT4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PScyNTAnIHI9JzE4MCcgZmlsbD0nbm9uZScgc3Ryb2tlPScjZThhMDAwJyBzdHJva2Utd2lkdGg9JzEuNScgb3BhY2l0eT0nMC4yNScvPgogIDxjaXJjbGUgY3g9JzQwMCcgY3k9JzI1MCcgcj0nMTQwJyBmaWxsPSdub25lJyBzdHJva2U9JyNlOGEwMDAnIHN0cm9rZS13aWR0aD0nMS41JyBvcGFjaXR5PScwLjM1Jy8+CiAgPGNpcmNsZSBjeD0nNDAwJyBjeT0nMjUwJyByPScxMDAnIGZpbGw9J25vbmUnIHN0cm9rZT0nI2ZmYzEwNycgc3Ryb2tlLXdpZHRoPScyJyBvcGFjaXR5PScwLjUnLz4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PScyNTAnIHI9JzYwJyBmaWxsPSdub25lJyBzdHJva2U9JyNmZmQ3NDAnIHN0cm9rZS13aWR0aD0nMi41JyBvcGFjaXR5PScwLjcnLz4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PScyNTAnIHI9JzI1JyBmaWxsPScjZmZlMDY2JyBvcGFjaXR5PScwLjknLz4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PScyNTAnIHI9JzgnIGZpbGw9J3doaXRlJyBvcGFjaXR5PScxJy8+CiAgPCEtLSBDcm9zcyBoYWlycyAtLT4KICA8bGluZSB4MT0nNDAwJyB5MT0nNTAnIHgyPSc0MDAnIHkyPScyMDAnIHN0cm9rZT0nI2ZmYzEwNycgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuNCcvPgogIDxsaW5lIHgxPSc0MDAnIHkxPSczMDAnIHgyPSc0MDAnIHkyPSc0NTAnIHN0cm9rZT0nI2ZmYzEwNycgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuNCcvPgogIDxsaW5lIHgxPScyMDAnIHkxPScyNTAnIHgyPSczNTAnIHkyPScyNTAnIHN0cm9rZT0nI2ZmYzEwNycgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuNCcvPgogIDxsaW5lIHgxPSc0NTAnIHkxPScyNTAnIHgyPSc2MDAnIHkyPScyNTAnIHN0cm9rZT0nI2ZmYzEwNycgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuNCcvPgogIDx0ZXh0IHg9JzQwMCcgeT0nNDMwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScyMicgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIG9wYWNpdHk9JzAuOScgZm9udC1zdHlsZT0naXRhbGljJz5NYXN0ZXJpbmcgRGVlcCBGb2N1czwvdGV4dD4KPC9zdmc+",
+    body:`<p>Cal Newport coined the term "deep work" to describe professional activities performed in a state of distraction-free concentration that push your cognitive capabilities to their limit. It is, he argues, both increasingly rare and increasingly valuable.</p>
+    <p>The economics are brutal. The ability to quickly learn hard things and produce at an elite level are converging on the same foundation: your capacity for sustained, uninterrupted thought. Every ping, every notification, every context switch erodes that capacity at the neurological level.</p>
+    <h2>The Cost of a Context Switch</h2>
+    <p>Research from Gloria Mark at UC Irvine shows that after an interruption, it takes an average of 23 minutes to fully return to a task. In a knowledge economy, this is a catastrophic tax — one most of us pay dozens of times per day without registering the cost.</p>
+    <blockquote>Clarity about what matters provides clarity about what does not.</blockquote>
+    <h2>Building a Deep Work Practice</h2>
+    <p>Start with time blocks. Reserve two to four hours per day — non-negotiably — for work that requires full concentration. Treat them with the same respect you would a meeting with your most important client.</p>
+    <p>Create a shutdown ritual. At the end of each day, review your task list, confirm nothing is urgent, and say a literal phrase: "Shutdown complete." This trains your brain to disengage fully, reducing the low-level anxiety that bleeds into evenings and weekends.</p>
+    <p>Embrace boredom. Checking your phone while waiting for a coffee trains your brain to demand stimulation the moment attention wavers. Practise doing nothing. The capacity for deep work is built, in part, in the spaces between tasks.</p>`},
+  art4:{tag:"Resilience",title:"Why Failure Is the Foundation of Growth",date:"March 24, 2026",read:"8 min read",img:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnNCcgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYTBhMmEnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjM2QxYTVhJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNiZzQpJy8+CiAgPCEtLSBSaXNpbmcgZ3JhcGggbGluZSAtLT4KICA8cG9seWxpbmUgcG9pbnRzPScxMDAsNDAwIDIwMCwzNjAgMjUwLDM4MCAzNTAsMzAwIDQyMCwzMjAgNTIwLDIwMCA2MjAsMTgwIDcyMCwxMDAnIHN0cm9rZT0nI2NlOTNkOCcgc3Ryb2tlLXdpZHRoPSczJyBmaWxsPSdub25lJyBvcGFjaXR5PScwLjgnLz4KICA8IS0tIERpcHMgd2l0aCBib3VuY2UgYmFjayAtLT4KICA8cG9seWxpbmUgcG9pbnRzPScxMDAsNDAwIDIwMCwzNjAgMjUwLDM4MCAzNTAsMzAwIDQyMCwzMjAgNTIwLDIwMCA2MjAsMTgwIDcyMCwxMDAnIHN0cm9rZT0nI2UxYmVlNycgc3Ryb2tlLXdpZHRoPScxJyBmaWxsPSdub25lJyBvcGFjaXR5PScwLjMnLz4KICA8IS0tIEFyZWEgZmlsbCAtLT4KICA8cG9seWdvbiBwb2ludHM9JzEwMCw0MDAgMjAwLDM2MCAyNTAsMzgwIDM1MCwzMDAgNDIwLDMyMCA1MjAsMjAwIDYyMCwxODAgNzIwLDEwMCA3MjAsNTAwIDEwMCw1MDAnIGZpbGw9JyM3YjFmYTInIG9wYWNpdHk9JzAuMTUnLz4KICA8IS0tIERvdHMgYXQgcG9pbnRzIC0tPgogIDxjaXJjbGUgY3g9JzEwMCcgY3k9JzQwMCcgcj0nNicgZmlsbD0nI2NlOTNkOCcvPgogIDxjaXJjbGUgY3g9JzI1MCcgY3k9JzM4MCcgcj0nNicgZmlsbD0nI2JhNjhjOCcvPgogIDxjaXJjbGUgY3g9JzQyMCcgY3k9JzMyMCcgcj0nNicgZmlsbD0nI2FiNDdiYycvPgogIDxjaXJjbGUgY3g9JzYyMCcgY3k9JzE4MCcgcj0nOCcgZmlsbD0nI2UwNDBmYicvPgogIDxjaXJjbGUgY3g9JzcyMCcgY3k9JzEwMCcgcj0nMTAnIGZpbGw9J3doaXRlJy8+CiAgPCEtLSBTdGFycyBpbiBiYWNrZ3JvdW5kIC0tPgogIDxjaXJjbGUgY3g9JzE1MCcgY3k9JzEwMCcgcj0nMS41JyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC41Jy8+CiAgPGNpcmNsZSBjeD0nNTAwJyBjeT0nODAnIHI9JzEnIGZpbGw9J3doaXRlJyBvcGFjaXR5PScwLjQnLz4KICA8Y2lyY2xlIGN4PSc2ODAnIGN5PScyMDAnIHI9JzEuNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMycvPgogIDxjaXJjbGUgY3g9JzM1MCcgY3k9JzE1MCcgcj0nMScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuNCcvPgogIDx0ZXh0IHg9JzQwMCcgeT0nNDYwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScyMicgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIG9wYWNpdHk9JzAuOScgZm9udC1zdHlsZT0naXRhbGljJz5UaGUgUGF0aCBvZiBSZXNpbGllbmNlPC90ZXh0Pgo8L3N2Zz4=",
+    body:`<p>We talk about failure as though it is a deviation from the path — a detour, an obstacle, an unwelcome interruption. The evidence suggests it is the path. At least, it is the part of the path that does all the actual work.</p>
+    <p>Stanford psychologist Laura Carstensen studies how people construct meaning across their lives. One of her most consistent findings: regret, for most people, is not about the things they tried and failed at. It is about the things they never tried at all.</p>
+    <blockquote>A smooth sea never made a skilled sailor. Every squall was a lesson paid for in salt water.</blockquote>
+    <h2>Post-Traumatic Growth</h2>
+    <p>Psychologists Richard Tedeschi and Lawrence Calhoun documented a phenomenon they called post-traumatic growth — positive psychological change that emerges from the struggle with highly challenging circumstances. Crucially, growth does not emerge from the trauma itself, but from the cognitive processing that follows it.</p>
+    <p>This is why journalling, therapy, and honest conversation are not luxuries after failure — they are the mechanism by which failure converts into learning. Without reflection, experience is just data that goes unprocessed.</p>
+    <h2>The Practical Response</h2>
+    <p>When something goes wrong, resist the impulse to move on quickly. Sit with the discomfort long enough to ask honest questions. What did I actually control here? What would I do differently? What did this reveal about my assumptions? These questions, asked sincerely, are the alchemical process that turns setback into insight.</p>
+    <p>Then — and this matters enormously — share it. Vulnerability about failure breaks the illusion that successful people do not fail. It does not. It breaks the illusion that failure makes you exceptional in the wrong direction. You are not uniquely bad at this. You are human, which means you are in progress.</p>`},
+  art5:{tag:"Routines",title:"Design a Morning Ritual That Actually Works",date:"March 18, 2026",read:"5 min read",img:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnNScgeDE9JzAlJyB5MT0nMCUnIHgyPScwJScgeTI9JzEwMCUnPgogICAgICA8c3RvcCBvZmZzZXQ9JzAlJyBzdG9wLWNvbG9yPScjZmY5YTU2Jy8+CiAgICAgIDxzdG9wIG9mZnNldD0nNTAlJyBzdG9wLWNvbG9yPScjZmZjYzcwJy8+CiAgICAgIDxzdG9wIG9mZnNldD0nMTAwJScgc3RvcC1jb2xvcj0nI2ZmZThhMCcvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0nc3VuNScgY3g9JzUwJScgY3k9JzQwJScgcj0nMjUlJz4KICAgICAgPHN0b3Agb2Zmc2V0PScwJScgc3RvcC1jb2xvcj0nI2ZmZicgc3RvcC1vcGFjaXR5PScwLjknLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjZmZhYTAwJyBzdG9wLW9wYWNpdHk9JzAnLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2JnNSknLz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNzdW41KScvPgogIDwhLS0gSG9yaXpvbiBsaW5lIHdpdGggaGlsbHMgLS0+CiAgPGVsbGlwc2UgY3g9JzQwMCcgY3k9JzUyMCcgcng9JzYwMCcgcnk9JzEyMCcgZmlsbD0nIzhkNmUzNicgb3BhY2l0eT0nMC42Jy8+CiAgPGVsbGlwc2UgY3g9JzIwMCcgY3k9JzUxMCcgcng9JzMwMCcgcnk9JzgwJyBmaWxsPScjNmQ0YzFmJyBvcGFjaXR5PScwLjUnLz4KICA8ZWxsaXBzZSBjeD0nNjUwJyBjeT0nNTE1JyByeD0nMjgwJyByeT0nNzUnIGZpbGw9JyM3ZDVjMmYnIG9wYWNpdHk9JzAuNScvPgogIDwhLS0gU3VuIGRpc2sgLS0+CiAgPGNpcmNsZSBjeD0nNDAwJyBjeT0nMjAwJyByPSc1NScgZmlsbD0nI2ZmZjllMCcgb3BhY2l0eT0nMC45NScvPgogIDxjaXJjbGUgY3g9JzQwMCcgY3k9JzIwMCcgcj0nNDInIGZpbGw9JyNmZmU1NjYnLz4KICA8IS0tIFN1biByYXlzIC0tPgogIDxsaW5lIHgxPSc0MDAnIHkxPScxMzAnIHgyPSc0MDAnIHkyPScxMDUnIHN0cm9rZT0nI2ZmZTU2Nicgc3Ryb2tlLXdpZHRoPSczJyBvcGFjaXR5PScwLjcnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDxsaW5lIHgxPSc0NjAnIHkxPScxNDgnIHgyPSc0NzgnIHkyPScxMzAnIHN0cm9rZT0nI2ZmZTU2Nicgc3Ryb2tlLXdpZHRoPSczJyBvcGFjaXR5PScwLjcnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDxsaW5lIHgxPSczNDAnIHkxPScxNDgnIHgyPSczMjInIHkyPScxMzAnIHN0cm9rZT0nI2ZmZTU2Nicgc3Ryb2tlLXdpZHRoPSczJyBvcGFjaXR5PScwLjcnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDxsaW5lIHgxPSc0ODAnIHkxPScyMDAnIHgyPSc1MDUnIHkyPScyMDAnIHN0cm9rZT0nI2ZmZTU2Nicgc3Ryb2tlLXdpZHRoPSczJyBvcGFjaXR5PScwLjcnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDxsaW5lIHgxPSczMjAnIHkxPScyMDAnIHgyPScyOTUnIHkyPScyMDAnIHN0cm9rZT0nI2ZmZTU2Nicgc3Ryb2tlLXdpZHRoPSczJyBvcGFjaXR5PScwLjcnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDwhLS0gQmlyZHMgaW4gc2t5IC0tPgogIDxwYXRoIGQ9J00xODAgMTYwIFExOTAgMTUzIDIwMCAxNjAnIHN0cm9rZT0nIzVkNDAzNycgc3Ryb2tlLXdpZHRoPScyJyBmaWxsPSdub25lJy8+CiAgPHBhdGggZD0nTTIxNSAxNDUgUTIyNSAxMzggMjM1IDE0NScgc3Ryb2tlPScjNWQ0MDM3JyBzdHJva2Utd2lkdGg9JzInIGZpbGw9J25vbmUnLz4KICA8cGF0aCBkPSdNNjAwIDE3MCBRNjEwIDE2MyA2MjAgMTcwJyBzdHJva2U9JyM1ZDQwMzcnIHN0cm9rZS13aWR0aD0nMicgZmlsbD0nbm9uZScvPgogIDx0ZXh0IHg9JzQwMCcgeT0nNDMwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScyMicgZmlsbD0nIzRhMmMwYScgdGV4dC1hbmNob3I9J21pZGRsZScgb3BhY2l0eT0nMC45JyBmb250LXN0eWxlPSdpdGFsaWMnPlRoZSBNb3JuaW5nIFJpdHVhbDwvdGV4dD4KPC9zdmc+",
+    body:`<p>The morning routine industrial complex would have you believe that waking at 4:30am, meditating for 45 minutes, journalling three pages, exercising for an hour, and cold plunging before the sun rises is the price of admission to a productive life. This is, to put it plainly, unsustainable nonsense for most people.</p>
+    <p>The goal of a morning ritual is not impressiveness. It is to move you from sleep to full functioning with as little friction and as much intention as possible. What achieves that is deeply personal.</p>
+    <blockquote>Win the morning, win the day — but the victory looks different for everyone.</blockquote>
+    <h2>The Three-Phase Framework</h2>
+    <p><strong>Phase 1: Recovery.</strong> Your brain needs roughly 30 minutes to transition from sleep architecture to waking executive function. Protect this window. Resist the urge to check your phone. Let your nervous system transition at its own pace. Drink water. Let light into the room.</p>
+    <p><strong>Phase 2: Anchoring.</strong> A single practice that centres your attention and intention. This might be five minutes of breathwork, a brief meditation, writing one sentence about what matters today, or simply sitting quietly with your coffee. The specific form matters far less than the consistency.</p>
+    <p><strong>Phase 3: Activation.</strong> The first meaningful work of your day. Schedule your most cognitively demanding task here, before meetings begin and inboxes accumulate. Your prefrontal cortex is at its freshest in the first hours after waking.</p>
+    <h2>Designing for Your Biology</h2>
+    <p>Chronotype — your biological predisposition toward morningness or eveningness — is largely genetic. Forcing yourself into a routine that fights your chronotype will cost more energy than it creates. A 7am ritual built around your natural rhythms will outperform a 5am ritual built around someone else's.</p>`},
+  art6:{tag:"Goals",title:"Stop Setting Goals. Start Building Systems",date:"March 12, 2026",read:"7 min read",img:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MDAnIGhlaWdodD0nNTAwJyB2aWV3Qm94PScwIDAgODAwIDUwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnNicgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwZDJiMWEnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjMWE1YzM2Jy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nODAwJyBoZWlnaHQ9JzUwMCcgZmlsbD0ndXJsKCNiZzYpJy8+CiAgPCEtLSBNb3VudGFpbiBwZWFrIC0tPgogIDxwb2x5Z29uIHBvaW50cz0nNDAwLDgwIDYwMCw0MjAgMjAwLDQyMCcgZmlsbD0nIzJlN2Q1Micgb3BhY2l0eT0nMC43Jy8+CiAgPHBvbHlnb24gcG9pbnRzPSc0MDAsODAgNjAwLDQyMCAyMDAsNDIwJyBmaWxsPSdub25lJyBzdHJva2U9JyM2OWYwYWUnIHN0cm9rZS13aWR0aD0nMicgb3BhY2l0eT0nMC42Jy8+CiAgPCEtLSBTbm93IGNhcCAtLT4KICA8cG9seWdvbiBwb2ludHM9JzQwMCw4MCA0NTUsMjAwIDM0NSwyMDAnIGZpbGw9J3doaXRlJyBvcGFjaXR5PScwLjgnLz4KICA8IS0tIFBhdGggd2luZGluZyB1cCAtLT4KICA8cGF0aCBkPSdNMjIwIDQxMCBRMzAwIDM4MCAzNDAgMzUwIFEzNjAgMzMwIDM4MCAzMDAgUTM5MCAyNzAgMzk1IDI0MCBRMzk4IDIwMCA0MDAgMTYwJyBzdHJva2U9JyNhNWQ2YTcnIHN0cm9rZS13aWR0aD0nMi41JyBzdHJva2UtZGFzaGFycmF5PSc4LDUnIGZpbGw9J25vbmUnIG9wYWNpdHk9JzAuOCcvPgogIDwhLS0gVGlueSBjbGltYmVyIGF0IHRvcCAtLT4KICA8Y2lyY2xlIGN4PSc0MDAnIGN5PScxNTUnIHI9JzcnIGZpbGw9JyNmZmUwNjYnLz4KICA8bGluZSB4MT0nNDAwJyB5MT0nMTYyJyB4Mj0nNDAwJyB5Mj0nMTgyJyBzdHJva2U9JyNmZmUwNjYnIHN0cm9rZS13aWR0aD0nMi41Jy8+CiAgPGxpbmUgeDE9JzQwMCcgeTE9JzE2OCcgeDI9JzM5MCcgeTI9JzE3OCcgc3Ryb2tlPScjZmZlMDY2JyBzdHJva2Utd2lkdGg9JzInIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDxsaW5lIHgxPSc0MDAnIHkxPScxNjgnIHgyPSc0MTAnIHkyPScxNzgnIHN0cm9rZT0nI2ZmZTA2Nicgc3Ryb2tlLXdpZHRoPScyJyBzdHJva2UtbGluZWNhcD0ncm91bmQnLz4KICA8bGluZSB4MT0nNDAwJyB5MT0nMTgyJyB4Mj0nMzkzJyB5Mj0nMTk2JyBzdHJva2U9JyNmZmUwNjYnIHN0cm9rZS13aWR0aD0nMicgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJy8+CiAgPGxpbmUgeDE9JzQwMCcgeTE9JzE4MicgeDI9JzQwNycgeTI9JzE5Nicgc3Ryb2tlPScjZmZlMDY2JyBzdHJva2Utd2lkdGg9JzInIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcvPgogIDwhLS0gU3RhcnMgLS0+CiAgPGNpcmNsZSBjeD0nMTAwJyBjeT0nMTAwJyByPScyJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC42Jy8+CiAgPGNpcmNsZSBjeD0nNzAwJyBjeT0nODAnIHI9JzEuNScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuNScvPgogIDxjaXJjbGUgY3g9JzE1MCcgY3k9JzIwMCcgcj0nMScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuNCcvPgogIDxjaXJjbGUgY3g9JzY4MCcgY3k9JzE4MCcgcj0nMS41JyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC41Jy8+CiAgPHRleHQgeD0nNDAwJyB5PSc0NjAnIGZvbnQtZmFtaWx5PSdHZW9yZ2lhLHNlcmlmJyBmb250LXNpemU9JzIyJyBmaWxsPSd3aGl0ZScgdGV4dC1hbmNob3I9J21pZGRsZScgb3BhY2l0eT0nMC45JyBmb250LXN0eWxlPSdpdGFsaWMnPlNldHRpbmcgUG93ZXJmdWwgR29hbHM8L3RleHQ+Cjwvc3ZnPg==",
+    body:`<p>Every January, millions of people set goals. By February, most have abandoned them. The problem is rarely willpower, ambition, or character. The problem is goals themselves — or rather, the belief that goals alone are sufficient.</p>
+    <p>Scott Adams, the creator of Dilbert, articulated it plainly: "Goals are for losers. Systems are for winners." He did not mean you should not want things. He meant that fixating on outcomes while neglecting the process is a recipe for frustration.</p>
+    <blockquote>You do not rise to the level of your goals. You fall to the level of your systems.</blockquote>
+    <h2>What Is a System?</h2>
+    <p>A system is a set of behaviours you perform regularly, regardless of how you feel, that reliably move you in a direction you care about. It does not depend on motivation — because motivation is a weather pattern, not a climate. Systems create the climate.</p>
+    <p>If your goal is to write a book, a system is writing 300 words every morning before work. If your goal is fitness, a system is training four times per week without negotiating with yourself about whether you feel like it. The system makes the decision in advance, so you do not have to make it under the pressure of the moment.</p>
+    <h2>The Identity Bridge</h2>
+    <p>The most powerful systems are those rooted in identity. "I want to run a marathon" is a goal. "I am a runner" is an identity. When the system flows from identity, missed days feel like exceptions. When it flows only from a goal, missed days feel like evidence that you were never really committed.</p>
+    <p>Ask yourself: what kind of person achieves what I want to achieve? Then ask: what would that person do today? Do that. Consistently. The outcomes will follow — usually on a timeline that surprises you.</p>`}
+};
+
+function openArticle(id, e) {
+  if(e) e.preventDefault();
+  const a = ARTICLES[id];
+  if(!a) return;
+  document.getElementById('articleContent').innerHTML = `
+    <span class="overlay-kicker">${a.tag}</span>
+    <h1 class="overlay-title">${a.title}</h1>
+    <p class="overlay-meta">${a.date} &nbsp;&bull;&nbsp; ${a.read}</p>
+    <img class="overlay-hero-img" src="${a.img}" alt="${a.title}" />
+    <div class="overlay-body">${a.body}</div>
+  `;
+  const ov = document.getElementById('articleOverlay');
+  ov.classList.add('open');
+  ov.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+function closeArticle() {
+  document.getElementById('articleOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('articleOverlay').addEventListener('click', function(e){
+  if(e.target === this) closeArticle();
+});
+
+// Navbar scroll
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Mobile nav
+document.getElementById('burger').addEventListener('click', () => {
+  document.getElementById('mobileNav').classList.toggle('open');
+  document.body.style.overflow = document.getElementById('mobileNav').classList.contains('open') ? 'hidden' : '';
+});
+function closeMobileNav() {
+  document.getElementById('mobileNav').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Scroll reveal
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(en => { if(en.isIntersecting) en.target.classList.add('visible'); });
+}, {threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+// Newsletter
+function handleNewsletterSubmit() {
+  const v = document.getElementById('nlEmail').value.trim();
+  if(!v || !/\S+@\S+\.\S+/.test(v)) { alert('Please enter a valid email.'); return; }
+  document.getElementById('nlFeedback').textContent = 'You are in! Check your inbox for a welcome note.';
+  document.getElementById('nlFeedback').style.color = '#a5d6a7';
+  document.getElementById('nlEmail').value = '';
+}
+
+// Contact form
+function handleContactSubmit(e) {
+  e.preventDefault();
+  const fname = document.getElementById('fname').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const message = document.getElementById('message').value.trim();
+  if(!fname || !email || !message){ alert('Please fill in the required fields.'); return; }
+  if(!/\S+@\S+\.\S+/.test(email)){ alert('Please enter a valid email address.'); return; }
+  const msg = document.getElementById('successMsg');
+  msg.style.display = 'block';
+  ['fname','lname','email','message'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('topic').selectedIndex=0;
+  setTimeout(() => { msg.style.display='none'; }, 6000);
+}
+
+// Escape key closes overlay
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeArticle(); });
+</script>
+</body>
+</html>
