@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Azzam — Personal Blog</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ─── RESET ─── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0812;
+  --bg2:#0f0d1a;
+  --surface:#16132a;
+  --surface2:#1e1a34;
+  --border:rgba(255,255,255,.07);
+  --text:#e8e4f0;
+  --muted:#7a748f;
+  --faint:#3a3550;
+  --orange:#ff6b35;
+  --orange-l:#ff8c5a;
+  --purple:#a855f7;
+  --cyan:#06b6d4;
+  --green:#22c55e;
+  --pink:#ec4899;
+  --yellow:#eab308;
+  --teal:#14b8a6;
+  --white:#ffffff;
+  --r:10px;
+  --shadow:0 8px 40px rgba(0,0,0,.45);
+  --shadow-lg:0 24px 80px rgba(0,0,0,.6);
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-weight:300;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--orange);border-radius:2px}
+::selection{background:var(--orange);color:white}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:'DM Sans',sans-serif}
+img{display:block;max-width:100%}
+
+/* ─── PAGES ─── */
+.page{display:none}
+.page.active{display:block}
+
+/* ─── CURSOR GLOW ─── */
+.cursor-glow{
+  position:fixed;width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,53,.06) 0%,transparent 70%);
+  pointer-events:none;z-index:0;transform:translate(-50%,-50%);
+  transition:left .15s ease,top .15s ease;
+}
+
+/* ─── NAV ─── */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 5vw;
+  transition:background .4s,backdrop-filter .4s,padding .4s;
+}
+#nav.scrolled{
+  background:rgba(10,8,18,.88);
+  backdrop-filter:blur(20px);
+  padding:.75rem 5vw;
+  border-bottom:1px solid var(--border);
+}
+.nav-brand{display:flex;align-items:center;gap:.9rem;cursor:pointer}
+.nav-avatar{width:36px;height:36px;border-radius:50%;overflow:hidden;border:2px solid var(--orange);flex-shrink:0}
+.nav-avatar img{width:100%;height:100%;object-fit:cover}
+.nav-name{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--white);letter-spacing:.02em}
+.nav-links{display:flex;align-items:center;gap:.2rem;list-style:none}
+.nav-links button{
+  background:none;border:none;color:var(--muted);
+  font-size:.82rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  padding:.45rem .9rem;border-radius:100px;transition:color .2s,background .2s;
+}
+.nav-links button:hover,.nav-links button.active{color:var(--white);background:rgba(255,255,255,.07)}
+.nav-links button.active{color:var(--orange)}
+.nav-search{
+  display:flex;align-items:center;gap:.5rem;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:100px;padding:.38rem .9rem;transition:border-color .2s,background .2s;
+}
+.nav-search:focus-within{border-color:var(--orange);background:rgba(255,107,53,.06)}
+.nav-search input{
+  background:none;border:none;outline:none;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.82rem;width:140px;
+}
+.nav-search input::placeholder{color:var(--muted)}
+.search-icon{color:var(--muted);font-size:.85rem;font-family:'DM Mono',monospace}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px}
+.burger span{width:22px;height:1.5px;background:var(--text);border-radius:1px;transition:.3s;display:block}
+.mob-menu{
+  display:none;position:fixed;inset:0;background:rgba(10,8,18,.98);z-index:99;
+  flex-direction:column;align-items:center;justify-content:center;gap:2rem;
+}
+.mob-menu.open{display:flex}
+.mob-menu button{background:none;border:none;color:white;font-family:'Playfair Display',serif;font-size:2rem;font-style:italic;transition:color .2s}
+.mob-menu button:hover{color:var(--orange)}
+.mob-close{position:absolute;top:1.5rem;right:2rem;background:none;border:none;color:var(--muted);font-size:1.8rem;line-height:1}
+
+/* ─── HOME: HERO ─── */
+.hero{
+  position:relative;min-height:100vh;display:flex;align-items:center;
+  overflow:hidden;
+}
+.hero-bg-wrap{position:absolute;inset:0;z-index:0}
+.hero-bg-wrap img{width:100%;height:100%;object-fit:cover;opacity:.8}
+.hero-noise{
+  position:absolute;inset:0;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:.4;pointer-events:none;
+}
+.hero-content{position:relative;z-index:2;padding:0 5vw;max-width:900px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:.6rem;
+  font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);margin-bottom:1.6rem;
+  animation:fadeUp .8s ease both;
+}
+.hero-eyebrow::before{content:'';width:28px;height:1px;background:var(--orange)}
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.2rem,7vw,6rem);
+  line-height:1.05;font-weight:900;color:var(--white);
+  margin-bottom:1.8rem;
+  animation:fadeUp .8s .12s ease both;
+}
+.hero-title .line{display:block}
+.hero-title .accent{
+  font-style:italic;color:transparent;
+  -webkit-text-stroke:1.5px var(--orange);
+  letter-spacing:-.01em;
+}
+.hero-desc{
+  color:rgba(232,228,240,.6);font-size:1.08rem;max-width:52ch;
+  margin-bottom:2.8rem;font-weight:300;
+  animation:fadeUp .8s .22s ease both;
+}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;animation:fadeUp .8s .32s ease both}
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.8rem 2rem;border-radius:100px;font-size:.85rem;font-weight:500;
+  letter-spacing:.04em;border:none;transition:all .22s;font-family:'DM Sans',sans-serif;
+}
+.btn-orange{background:var(--orange);color:white;box-shadow:0 4px 24px rgba(255,107,53,.35)}
+.btn-orange:hover{background:var(--orange-l);transform:translateY(-2px);box-shadow:0 8px 32px rgba(255,107,53,.45)}
+.btn-ghost{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);transform:translateY(-2px)}
+.hero-scroll{
+  position:absolute;bottom:2rem;left:5vw;z-index:2;
+  display:flex;align-items:center;gap:.7rem;
+  color:var(--muted);font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;
+  cursor:pointer;animation:fadeUp .8s .5s ease both;
+}
+.hero-scroll-line{width:44px;height:1px;background:linear-gradient(to right,var(--orange),transparent)}
+.hero-stats{
+  position:absolute;bottom:2rem;right:5vw;z-index:2;
+  display:flex;gap:2.5rem;
+  animation:fadeUp .8s .5s ease both;
+}
+.hstat{text-align:right}
+.hstat-n{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--white);line-height:1;display:block}
+.hstat-l{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-top:.2rem}
+
+/* ─── SECTION STYLES ─── */
+.section{padding:5.5rem 5vw}
+.sec-label{
+  display:inline-flex;align-items:center;gap:.55rem;
+  font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--orange);margin-bottom:.7rem;
+}
+.sec-label::before{content:'';width:18px;height:1px;background:var(--orange)}
+.sec-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.9rem,3vw,2.8rem);
+  font-weight:700;color:var(--white);line-height:1.18;margin-bottom:.5rem;
+}
+.sec-title em{font-style:italic;color:var(--orange)}
+.sec-sub{color:var(--muted);font-size:.93rem;max-width:52ch}
+
+/* ─── FEATURED POST ─── */
+.featured-post{
+  display:grid;grid-template-columns:1.15fr 1fr;gap:0;
+  border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg);
+  background:var(--surface);border:1px solid var(--border);
+  cursor:pointer;transition:transform .3s,box-shadow .3s;
+}
+.featured-post:hover{transform:translateY(-4px);box-shadow:0 32px 100px rgba(0,0,0,.65)}
+.featured-img{height:480px;overflow:hidden;position:relative}
+.featured-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.featured-post:hover .featured-img img{transform:scale(1.04)}
+.featured-img-overlay{position:absolute;inset:0;background:linear-gradient(to right,transparent,var(--surface) 85%)}
+.featured-body{padding:3rem 2.5rem;display:flex;flex-direction:column;justify-content:center}
+.post-cat{
+  display:inline-block;font-family:'DM Mono',monospace;font-size:.66rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--orange);
+  margin-bottom:1rem;border-bottom:1px solid var(--orange);padding-bottom:.2rem;
+}
+.featured-body h2{
+  font-family:'Playfair Display',serif;font-size:clamp(1.7rem,2.5vw,2.2rem);
+  font-weight:700;color:var(--white);line-height:1.22;margin-bottom:1rem;
+  transition:color .2s;
+}
+.featured-post:hover .featured-body h2{color:var(--orange)}
+.featured-body p{color:var(--muted);font-size:.93rem;line-height:1.75;margin-bottom:1.8rem}
+.post-meta{display:flex;align-items:center;gap:1rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.06em}
+.meta-dot{width:3px;height:3px;border-radius:50%;background:var(--faint)}
+.read-time{color:var(--orange)}
+
+/* ─── POST GRID ─── */
+.posts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem}
+.post-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;cursor:pointer;transition:transform .28s,box-shadow .28s,border-color .28s;
+  position:relative;
+}
+.post-card:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:rgba(255,107,53,.25)}
+.post-card-img{height:200px;overflow:hidden;position:relative}
+.post-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .45s}
+.post-card:hover .post-card-img img{transform:scale(1.06)}
+.cat-pill{
+  position:absolute;top:.85rem;left:.85rem;
+  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
+  padding:.25rem .7rem;border-radius:100px;font-weight:500;
+  backdrop-filter:blur(8px);
+}
+.pill-tech{background:rgba(59,130,246,.25);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.pill-life{background:rgba(249,115,22,.25);color:#fdba74;border:1px solid rgba(249,115,22,.3)}
+.pill-growth{background:rgba(34,197,94,.25);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+.pill-creative{background:rgba(236,72,153,.25);color:#f9a8d4;border:1px solid rgba(236,72,153,.3)}
+.pill-philosophy{background:rgba(168,85,247,.25);color:#d8b4fe;border:1px solid rgba(168,85,247,.3)}
+.pill-health{background:rgba(20,184,166,.25);color:#5eead4;border:1px solid rgba(20,184,166,.3)}
+.pill-learning{background:rgba(234,179,8,.25);color:#fde047;border:1px solid rgba(234,179,8,.3)}
+.pill-books{background:rgba(168,85,247,.25);color:#d8b4fe;border:1px solid rgba(168,85,247,.3)}
+.post-card-body{padding:1.4rem}
+.post-card-title{
+  font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;
+  color:var(--white);line-height:1.35;margin:.4rem 0 .65rem;transition:color .2s;
+}
+.post-card:hover .post-card-title{color:var(--orange)}
+.post-card-exc{font-size:.85rem;color:var(--muted);line-height:1.68;margin-bottom:1.1rem}
+.post-card-meta{display:flex;justify-content:space-between;align-items:center;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);padding-top:.9rem;border-top:1px solid var(--border)}
+
+/* ─── TOPICS ─── */
+.topics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-top:2.5rem}
+.topic-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:1.6rem 1.4rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;
+}
+.topic-card::before{
+  content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;
+  background:linear-gradient(135deg,var(--topic-color,var(--orange)) 0%,transparent 60%);
+}
+.topic-card:hover{border-color:var(--topic-color,var(--orange));transform:translateY(-3px)}
+.topic-card:hover::before{opacity:.06}
+.topic-letter{
+  font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;
+  color:var(--topic-color,var(--orange));opacity:.18;line-height:1;margin-bottom:.6rem;
+  transition:opacity .25s;
+}
+.topic-card:hover .topic-letter{opacity:.3}
+.topic-name{font-weight:600;font-size:.95rem;color:var(--white);margin-bottom:.2rem}
+.topic-count{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.06em}
+
+/* ─── NEWSLETTER ─── */
+.nl-bar{
+  background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:4rem 5vw;
+}
+.nl-inner{
+  max-width:680px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;
+}
+.nl-text .sec-title{font-size:1.8rem}
+.nl-text p{color:var(--muted);font-size:.9rem;margin-top:.5rem}
+.nl-form-wrap{display:flex;flex-direction:column;gap:.8rem}
+.nl-form{display:flex;gap:.6rem}
+.nl-input{
+  flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:100px;padding:.72rem 1.2rem;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.87rem;
+  transition:border-color .2s,background .2s;
+}
+.nl-input::placeholder{color:var(--muted)}
+.nl-input:focus{outline:none;border-color:var(--orange);background:rgba(255,107,53,.05)}
+.nl-note{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.04em}
+
+/* ─── ABOUT PAGE ─── */
+.about-hero{
+  min-height:80vh;display:flex;align-items:center;
+  padding:9rem 5vw 5rem;position:relative;overflow:hidden;
+}
+.about-hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 60% 50%,rgba(255,107,53,.08) 0%,transparent 60%);
+}
+.about-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:5rem;align-items:center;position:relative;z-index:1}
+.about-img-wrap{position:relative}
+.about-img{
+  width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:16px;
+  display:block;box-shadow:var(--shadow-lg);border:1px solid var(--border);
+}
+.about-img-accent{
+  position:absolute;top:-20px;right:-20px;
+  width:160px;height:160px;border-radius:50%;
+  border:1px solid var(--orange);opacity:.3;
+}
+.about-img-accent2{
+  position:absolute;bottom:-16px;left:-16px;
+  width:100px;height:100px;border-radius:50%;
+  background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);
+}
+.about-text .sec-title{margin-bottom:1.1rem;font-size:clamp(2rem,3.5vw,3rem)}
+.about-text p{color:rgba(232,228,240,.65);margin-bottom:1.1rem;font-size:.97rem;line-height:1.8}
+.about-skills{display:flex;flex-wrap:wrap;gap:.65rem;margin:1.8rem 0}
+.skill-tag{
+  font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.08em;
+  padding:.35rem .85rem;border-radius:100px;border:1px solid var(--border);
+  color:var(--muted);transition:all .2s;
+}
+.skill-tag:hover{border-color:var(--orange);color:var(--orange)}
+.about-links{display:flex;gap:.8rem;margin-top:1.8rem;flex-wrap:wrap}
+.social-link{
+  display:inline-flex;align-items:center;gap:.45rem;
+  font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--border);
+  padding:.5rem 1.1rem;border-radius:100px;transition:all .2s;
+}
+.social-link:hover{color:var(--orange);border-color:var(--orange)}
+.timeline{padding:5rem 5vw;max-width:860px;margin:0 auto}
+.timeline-item{display:grid;grid-template-columns:120px 1fr;gap:2rem;padding:2rem 0;border-bottom:1px solid var(--border);position:relative}
+.timeline-item::before{
+  content:'';position:absolute;left:119px;top:2.4rem;
+  width:8px;height:8px;border-radius:50%;background:var(--orange);
+  box-shadow:0 0 0 3px rgba(255,107,53,.2);
+}
+.timeline-year{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--orange);letter-spacing:.08em;padding-top:.1rem;text-align:right}
+.timeline-content h4{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--white);margin-bottom:.35rem}
+.timeline-content p{font-size:.88rem;color:var(--muted);line-height:1.7}
+
+/* ─── BLOG PAGE ─── */
+.blog-hero{padding:8.5rem 5vw 3.5rem;border-bottom:1px solid var(--border)}
+.blog-hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5vw,4rem);font-weight:900;color:var(--white)}
+.blog-hero h1 em{font-style:italic;color:var(--orange)}
+.blog-hero p{color:var(--muted);margin-top:.6rem;font-size:.97rem}
+.blog-layout{display:grid;grid-template-columns:1fr 300px;gap:3rem;padding:3.5rem 5vw;align-items:start}
+.blog-posts{display:flex;flex-direction:column;gap:1.8rem}
+.blog-post-row{
+  display:grid;grid-template-columns:240px 1fr;gap:0;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;cursor:pointer;
+  transition:transform .25s,box-shadow .25s,border-color .25s;
+}
+.blog-post-row:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(255,107,53,.25)}
+.blog-row-img{height:180px;overflow:hidden}
+.blog-row-img img{width:100%;height:100%;object-fit:cover;transition:transform .45s}
+.blog-post-row:hover .blog-row-img img{transform:scale(1.05)}
+.blog-row-body{padding:1.6rem}
+.blog-row-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--white);line-height:1.3;margin:.5rem 0 .7rem;transition:color .2s}
+.blog-post-row:hover .blog-row-title{color:var(--orange)}
+.blog-row-exc{font-size:.86rem;color:var(--muted);line-height:1.68;margin-bottom:1rem}
+.blog-row-meta{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);display:flex;gap:1rem;align-items:center}
+/* Sidebar */
+.sidebar{position:sticky;top:5.5rem;display:flex;flex-direction:column;gap:1.6rem}
+.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+.sidebar-title{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);margin-bottom:1.2rem}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:.5rem}
+.tag-chip{
+  font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.06em;
+  padding:.28rem .75rem;border-radius:100px;border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:all .2s;
+}
+.tag-chip:hover,.tag-chip.active{border-color:var(--orange);color:var(--orange);background:rgba(255,107,53,.06)}
+.popular-post{display:flex;gap:.9rem;align-items:flex-start;padding:.7rem 0;border-bottom:1px solid var(--border);cursor:pointer}
+.popular-post:last-child{border-bottom:none}
+.pop-num{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:500;color:var(--faint);line-height:1;flex-shrink:0;padding-top:.1rem}
+.pop-title{font-size:.84rem;color:var(--text);line-height:1.45;transition:color .2s}
+.popular-post:hover .pop-title{color:var(--orange)}
+.pop-date{font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);margin-top:.3rem}
+
+/* ─── ARTICLE READER ─── */
+.reader-overlay{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:var(--bg);overflow-y:auto;
+}
+.reader-overlay.open{display:block}
+.reader-nav{
+  position:sticky;top:0;background:rgba(10,8,18,.9);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);padding:1rem 5vw;
+  display:flex;align-items:center;justify-content:space-between;z-index:201;
+}
+.reader-back{display:flex;align-items:center;gap:.55rem;background:none;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s}
+.reader-back:hover{color:var(--orange)}
+.reader-progress{flex:1;max-width:200px;height:2px;background:var(--faint);border-radius:1px;margin:0 2rem}
+.reader-progress-fill{height:100%;background:var(--orange);border-radius:1px;width:0;transition:width .1s}
+.reader-actions{display:flex;gap:.6rem}
+.reader-action-btn{
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  color:var(--muted);padding:.4rem .9rem;border-radius:100px;
+  font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;
+  transition:all .2s;
+}
+.reader-action-btn:hover{border-color:var(--orange);color:var(--orange)}
+.reader-inner{max-width:720px;margin:0 auto;padding:4rem 2rem 6rem}
+.reader-cat{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:1rem}
+.reader-title{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,4vw,3.4rem);font-weight:900;color:var(--white);line-height:1.1;margin-bottom:1.2rem}
+.reader-meta{display:flex;align-items:center;gap:1.2rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
+.reader-author-av{width:32px;height:32px;border-radius:50%;overflow:hidden;border:1.5px solid var(--orange)}
+.reader-author-av img{width:100%;height:100%;object-fit:cover}
+.reader-cover{width:100%;height:400px;object-fit:cover;border-radius:12px;margin-bottom:2.5rem;border:1px solid var(--border)}
+.reader-body{font-size:1.05rem;line-height:1.92;color:rgba(232,228,240,.82);font-weight:300}
+.reader-body p{margin-bottom:1.5rem}
+.reader-body h2{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--white);margin:2.5rem 0 .9rem;line-height:1.2}
+.reader-body h3{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--white);margin:1.8rem 0 .7rem}
+.reader-body blockquote{
+  border-left:2px solid var(--orange);padding:1rem 1.5rem;margin:2rem 0;
+  background:rgba(255,107,53,.04);border-radius:0 8px 8px 0;
+  font-style:italic;color:rgba(232,228,240,.65);font-size:1.08rem;
+}
+.reader-body code{
+  font-family:'DM Mono',monospace;font-size:.88em;
+  background:var(--surface2);color:var(--orange);
+  padding:.15em .45em;border-radius:4px;
+}
+.reader-tags{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border)}
+.related-posts{margin-top:4rem;padding-top:2.5rem;border-top:1px solid var(--border)}
+.related-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;margin-top:1.5rem}
+
+/* ─── CONTACT PAGE ─── */
+.contact-hero{padding:9rem 5vw 4rem}
+.contact-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:5rem;align-items:start;padding:0 5vw 5rem}
+.contact-left h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,3vw,2.8rem);font-weight:700;color:var(--white);line-height:1.2;margin-bottom:1rem}
+.contact-left p{color:var(--muted);font-size:.95rem;line-height:1.75;margin-bottom:2rem}
+.contact-item{margin-bottom:1.4rem}
+.c-label{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:.3rem}
+.c-value{font-size:.93rem;color:var(--text)}
+.contact-form{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2.5rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.fg{display:flex;flex-direction:column;margin-bottom:1.2rem}
+.fg label{font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.42rem}
+.fg input,.fg textarea,.fg select{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:var(--r);padding:.72rem 1rem;
+  font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text);
+  transition:border-color .2s,background .2s;resize:vertical;
+}
+.fg input:focus,.fg textarea:focus,.fg select:focus{outline:none;border-color:var(--orange);background:rgba(255,107,53,.04)}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--muted)}
+.fg textarea{min-height:120px}
+.fg select option{background:var(--surface)}
+.form-submit{
+  width:100%;padding:.85rem;background:var(--orange);color:white;border:none;
+  border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;
+  letter-spacing:.04em;transition:background .2s,transform .15s;
+  box-shadow:0 4px 20px rgba(255,107,53,.3);
+}
+.form-submit:hover{background:var(--orange-l);transform:translateY(-2px)}
+.success-msg{display:none;background:rgba(34,197,94,.1);color:#86efac;padding:.9rem 1.1rem;border-radius:var(--r);margin-bottom:1.1rem;border:1px solid rgba(34,197,94,.2);font-size:.86rem}
+
+/* ─── FOOTER ─── */
+footer{
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:4rem 5vw 2.5rem;
+}
+.footer-top{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3.5rem}
+.footer-brand p{color:var(--muted);font-size:.86rem;line-height:1.7;margin-top:.9rem;max-width:28ch}
+.footer-col h4{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:1.1rem}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:.55rem}
+.footer-col button,.footer-col a{
+  background:none;border:none;color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:.84rem;
+  text-decoration:none;transition:color .2s;text-align:left;padding:0;
+}
+.footer-col button:hover,.footer-col a:hover{color:var(--orange)}
+.footer-bottom{
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--border);padding-top:2rem;
+  font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.04em;
+  flex-wrap:wrap;gap:1rem;
+}
+.footer-bottom a{color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-bottom a:hover{color:var(--orange)}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}
+.reveal.vis{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}.reveal-d4{transition-delay:.4s}
+
+/* ─── SEARCH RESULTS ─── */
+.search-overlay{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(10,8,18,.96);backdrop-filter:blur(20px);
+  overflow-y:auto;padding:8rem 5vw;
+}
+.search-overlay.open{display:block}
+.search-overlay-input-wrap{max-width:680px;margin:0 auto 3rem;position:relative}
+.search-overlay-input{
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:100px;padding:1rem 1.5rem;color:var(--text);
+  font-family:'Playfair Display',serif;font-size:1.4rem;font-style:italic;
+  transition:border-color .2s;
+}
+.search-overlay-input:focus{outline:none;border-color:var(--orange)}
+.search-close{
+  position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--muted);font-size:1.3rem;transition:color .2s;
+}
+.search-close:hover{color:var(--orange)}
+.search-results{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:1rem}
+.search-result-item{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:1.3rem 1.5rem;cursor:pointer;transition:border-color .2s;
+}
+.search-result-item:hover{border-color:var(--orange)}
+.sr-cat{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:.4rem}
+.sr-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--white);margin-bottom:.3rem}
+.sr-exc{font-size:.83rem;color:var(--muted)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1100px){
+  .topics-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-top{grid-template-columns:1fr 1fr}
+}
+@media(max-width:900px){
+  .featured-post{grid-template-columns:1fr}
+  .featured-img{height:280px}
+  .featured-img-overlay{display:none}
+  .posts-grid{grid-template-columns:1fr 1fr}
+  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .nl-inner{grid-template-columns:1fr}
+  .blog-layout{grid-template-columns:1fr}
+  .sidebar{position:static}
+  .nav-links{display:none}
+  .nav-search{display:none}
+  .burger{display:flex}
+  .hero-stats{display:none}
+  .timeline-item{grid-template-columns:80px 1fr}
+  .related-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .posts-grid{grid-template-columns:1fr}
+  .topics-grid{grid-template-columns:1fr 1fr}
+  .blog-post-row{grid-template-columns:1fr}
+  .blog-row-img{height:200px}
+  .form-row{grid-template-columns:1fr}
+  .hero-title{font-size:clamp(2.4rem,8vw,3.5rem)}
+  .footer-top{grid-template-columns:1fr}
+  .reader-cover{height:220px}
+  .hero-ctas{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- cursor glow -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- ─── SEARCH OVERLAY ─── -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-overlay-input-wrap">
+    <input class="search-overlay-input" id="searchInput" placeholder="Search posts…" oninput="runSearch(this.value)"/>
+    <button class="search-close" onclick="closeSearch()">&#x2715;</button>
+  </div>
+  <div class="search-results" id="searchResults"></div>
+</div>
+
+<!-- ─── ARTICLE READER ─── -->
+<div class="reader-overlay" id="readerOverlay">
+  <div class="reader-nav">
+    <button class="reader-back" onclick="closeReader()">&#x2190; &nbsp; Back</button>
+    <div class="reader-progress"><div class="reader-progress-fill" id="readerProgress"></div></div>
+    <div class="reader-actions">
+      <button class="reader-action-btn" onclick="sharePost()">Share</button>
+      <button class="reader-action-btn" onclick="bookmarkPost()">Bookmark</button>
+    </div>
+  </div>
+  <div class="reader-inner" id="readerContent"></div>
+</div>
+
+<!-- ─── NAVBAR ─── -->
+<nav id="nav">
+  <div class="nav-brand" onclick="showPage('home')">
+    <div class="nav-avatar"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSczMDAnIGhlaWdodD0nMzAwJz4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0nZycgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMyYTFmM2QnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjNGEzYTZiJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nMzAwJyBoZWlnaHQ9JzMwMCcgZmlsbD0ndXJsKCNnKScvPgogIDxlbGxpcHNlIGN4PScxNTAnIGN5PScxMzUnIHJ4PSc1Micgcnk9JzYwJyBmaWxsPScjZThkNWI4JyBvcGFjaXR5PScwLjk1Jy8+CiAgPGVsbGlwc2UgY3g9JzE1MCcgY3k9Jzk2JyByeD0nNTgnIHJ5PSczOCcgZmlsbD0nIzFhMGUwNicgb3BhY2l0eT0nMC44OCcvPgogIDxwYXRoIGQ9J003MCwyNjAgUTExMCwyMjggMTUwLDIzNCBRMTkwLDIyOCAyMzAsMjYwIEwyMzUsMzAwIEw2NSwzMDBaJyBmaWxsPScjM2EyZDVhJyBvcGFjaXR5PScwLjg1Jy8+CiAgPGVsbGlwc2UgY3g9JzEzNicgY3k9JzEzNScgcng9JzcnIHJ5PSc4JyBmaWxsPScjMmExYTA4Jy8+CiAgPGVsbGlwc2UgY3g9JzE2NCcgY3k9JzEzNScgcng9JzcnIHJ5PSc4JyBmaWxsPScjMmExYTA4Jy8+CiAgPHBhdGggZD0nTTEzNiwxNTggUTE1MCwxNzAgMTY0LDE1OCcgc3Ryb2tlPScjOGE1YTJhJyBzdHJva2Utd2lkdGg9JzIuNScgZmlsbD0nbm9uZScgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJy8+Cjwvc3ZnPg==" alt="Azzam"/></div>
+    <span class="nav-name">Azzam</span>
+  </div>
+  <ul class="nav-links">
+    <li><button onclick="showPage('home')" id="navHome" class="active">Home</button></li>
+    <li><button onclick="showPage('blog')" id="navBlog">Blog</button></li>
+    <li><button onclick="showPage('about')" id="navAbout">About</button></li>
+    <li><button onclick="showPage('contact')" id="navContact">Contact</button></li>
+  </ul>
+  <div class="nav-search" onclick="openSearch()">
+    <span class="search-icon">&#x2315;</span>
+    <input placeholder="Search…" readonly style="cursor:pointer"/>
+  </div>
+  <button class="burger" id="burger"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mob-menu" id="mobMenu">
+  <button class="mob-close" onclick="closeMob()">&#x2715;</button>
+  <button onclick="showPage('home');closeMob()">Home</button>
+  <button onclick="showPage('blog');closeMob()">Blog</button>
+  <button onclick="showPage('about');closeMob()">About</button>
+  <button onclick="showPage('contact');closeMob()">Contact</button>
+  <button onclick="openSearch();closeMob()" style="font-size:1.2rem;color:var(--orange)">Search</button>
+</div>
+
+<!-- ╔══════════════════════════════════
+     HOME PAGE
+══════════════════════════════════╗ -->
+<div id="page-home" class="page active">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg-wrap"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzcwMCc+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9J2JnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgICAgPHN0b3Agb2Zmc2V0PScwJScgc3RvcC1jb2xvcj0nIzBhMDgxMicvPgogICAgICA8c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyMxNDEwMmEnLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9J2Jsb2IxJyBjeD0nMjAlJyBjeT0nNDAlJyByPSczNSUnPgogICAgICA8c3RvcCBvZmZzZXQ9JzAlJyBzdG9wLWNvbG9yPScjZmY2YjM1JyBzdG9wLW9wYWNpdHk9JzAuMTInLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjZmY2YjM1JyBzdG9wLW9wYWNpdHk9JzAnLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9J2Jsb2IyJyBjeD0nODAlJyBjeT0nNjAlJyByPSc0MCUnPgogICAgICA8c3RvcCBvZmZzZXQ9JzAlJyBzdG9wLWNvbG9yPScjYTg1NWY3JyBzdG9wLW9wYWNpdHk9JzAuMScvPgogICAgICA8c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyNhODU1ZjcnIHN0b3Atb3BhY2l0eT0nMCcvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0nYmxvYjMnIGN4PSc1MCUnIGN5PScyMCUnIHI9JzMwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwNmI2ZDQnIHN0b3Atb3BhY2l0eT0nMC4wNycvPgogICAgICA8c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyMwNmI2ZDQnIHN0b3Atb3BhY2l0eT0nMCcvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNzAwJyBmaWxsPSd1cmwoI2JnKScvPgogIDxyZWN0IHdpZHRoPScxNDAwJyBoZWlnaHQ9JzcwMCcgZmlsbD0ndXJsKCNibG9iMSknLz4KICA8cmVjdCB3aWR0aD0nMTQwMCcgaGVpZ2h0PSc3MDAnIGZpbGw9J3VybCgjYmxvYjIpJy8+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNzAwJyBmaWxsPSd1cmwoI2Jsb2IzKScvPgogIDwhLS0gR3JpZCBsaW5lcyAtLT4KICA8bGluZSB4MT0nMCcgeTE9JzE3NScgeDI9JzE0MDAnIHkyPScxNzUnIHN0cm9rZT0nd2hpdGUnIHN0cm9rZS13aWR0aD0nMC40JyBvcGFjaXR5PScwLjA0Jy8+CiAgPGxpbmUgeDE9JzAnIHkxPSczNTAnIHgyPScxNDAwJyB5Mj0nMzUwJyBzdHJva2U9J3doaXRlJyBzdHJva2Utd2lkdGg9JzAuNCcgb3BhY2l0eT0nMC4wNCcvPgogIDxsaW5lIHgxPScwJyB5MT0nNTI1JyB4Mj0nMTQwMCcgeTI9JzUyNScgc3Ryb2tlPSd3aGl0ZScgc3Ryb2tlLXdpZHRoPScwLjQnIG9wYWNpdHk9JzAuMDQnLz4KICA8bGluZSB4MT0nMzUwJyB5MT0nMCcgeDI9JzM1MCcgeTI9JzcwMCcgc3Ryb2tlPSd3aGl0ZScgc3Ryb2tlLXdpZHRoPScwLjQnIG9wYWNpdHk9JzAuMDQnLz4KICA8bGluZSB4MT0nNzAwJyB5MT0nMCcgeDI9JzcwMCcgeTI9JzcwMCcgc3Ryb2tlPSd3aGl0ZScgc3Ryb2tlLXdpZHRoPScwLjQnIG9wYWNpdHk9JzAuMDQnLz4KICA8bGluZSB4MT0nMTA1MCcgeTE9JzAnIHgyPScxMDUwJyB5Mj0nNzAwJyBzdHJva2U9J3doaXRlJyBzdHJva2Utd2lkdGg9JzAuNCcgb3BhY2l0eT0nMC4wNCcvPgogIDwhLS0gRG90cyAtLT4KICA8Y2lyY2xlIGN4PScxMjAnIGN5PSc4MCcgcj0nMS41JyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC4xNScvPgogIDxjaXJjbGUgY3g9JzM4MCcgY3k9JzE0MCcgcj0nMScgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTInLz4KICA8Y2lyY2xlIGN4PSc5MDAnIGN5PSc2MCcgcj0nMicgZmlsbD0nd2hpdGUnIG9wYWNpdHk9JzAuMTgnLz4KICA8Y2lyY2xlIGN4PScxMjAwJyBjeT0nMjAwJyByPScxLjUnIGZpbGw9J3doaXRlJyBvcGFjaXR5PScwLjEyJy8+CiAgPGNpcmNsZSBjeD0nNjUwJyBjeT0nNTgwJyByPScxJyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC4xJy8+CiAgPGNpcmNsZSBjeD0nMTEwMCcgY3k9JzUwMCcgcj0nMS41JyBmaWxsPSd3aGl0ZScgb3BhY2l0eT0nMC4xNCcvPgo8L3N2Zz4=" alt=""/></div>
+    <div class="hero-noise"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Writing on the things that matter</div>
+      <h1 class="hero-title">
+        <span class="line">Ideas.</span>
+        <span class="line accent">Stories.</span>
+        <span class="line">Reflections.</span>
+      </h1>
+      <p class="hero-desc">A personal corner of the internet where I share everything I'm learning, thinking, and building — from technology to life, philosophy to craft.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-orange" onclick="showPage('blog')">Read the Blog</button>
+        <button class="btn btn-ghost" onclick="showPage('about')">About Me</button>
+      </div>
+    </div>
+    <div class="hero-scroll" onclick="document.getElementById('home-featured').scrollIntoView({behavior:'smooth'})">
+      <div class="hero-scroll-line"></div>
+      <span>Scroll to explore</span>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><span class="hstat-n">48</span><span class="hstat-l">Articles</span></div>
+      <div class="hstat"><span class="hstat-n">8</span><span class="hstat-l">Topics</span></div>
+      <div class="hstat"><span class="hstat-n">3yr</span><span class="hstat-l">Writing</span></div>
+    </div>
+  </section>
+
+  <!-- Featured post -->
+  <section class="section" id="home-featured" style="padding-bottom:2.5rem">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem">
+      <div>
+        <div class="sec-label reveal">Featured</div>
+        <h2 class="sec-title reveal reveal-d1">The post worth <em>reading first</em></h2>
+      </div>
+      <button class="btn btn-ghost reveal" onclick="showPage('blog')" style="padding:.6rem 1.4rem;font-size:.78rem">All posts</button>
+    </div>
+    <div class="featured-post reveal" onclick="openPost('p1')">
+      <div class="featured-img"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwZjE3MmEnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyMzYjgyZjYnIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPHBhdGggZD0nTTAgMjUwIFExNzUgMTUwIDM1MCAyNTAgUTUyNSAzNTAgNzAwIDI1MCBRODc1IDE1MCAxMDUwIDI1MCBRMTIyNSAzNTAgMTQwMCAyNTAgTDE0MDAgNTAwIEwwIDUwMFonIGZpbGw9JyMwNmI2ZDQnIG9wYWNpdHk9JzAuMjUnLz4KICA8cGF0aCBkPSdNMCAzMDAgUTE3NSAyMDAgMzUwIDMwMCBRNTI1IDQwMCA3MDAgMzAwIFE4NzUgMjAwIDEwNTAgMzAwIFExMjI1IDQwMCAxNDAwIDMwMCBMMTQwMCA1MDAgTDAgNTAwWicgZmlsbD0nIzA2YjZkNCcgb3BhY2l0eT0nMC4xNScvPgogIDxjaXJjbGUgY3g9JzcwMCcgY3k9JzIyMCcgcj0nODAnIGZpbGw9JyMzYjgyZjYnIG9wYWNpdHk9JzAuMicvPgogIDxjaXJjbGUgY3g9JzcwMCcgY3k9JzIyMCcgcj0nNDUnIGZpbGw9JyMzYjgyZjYnIG9wYWNpdHk9JzAuMzUnLz4KICA8dGV4dCB4PSc3MDAnIHk9JzQ2MCcgZm9udC1mYW1pbHk9J0dlb3JnaWEsc2VyaWYnIGZvbnQtc2l6ZT0nMTgnIGZpbGw9J3doaXRlJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBvcGFjaXR5PScwLjUnIGxldHRlci1zcGFjaW5nPSc0Jz5URUNITk9MT0dZPC90ZXh0Pgo8L3N2Zz4=" alt=""/><div class="featured-img-overlay"></div></div>
+      <div class="featured-body">
+        <span class="post-cat">Technology</span>
+        <h2>How I Learned to Stop Worrying and Love Constraints</h2>
+        <p>The best creative work of my life came from the most limited circumstances. A tiny screen, a slow connection, a single afternoon. Constraints, I've come to believe, are not the enemy of creativity — they are its engine.</p>
+        <div class="post-meta">
+          <span>May 2026</span>
+          <div class="meta-dot"></div>
+          <span class="read-time">8 min read</span>
+          <div class="meta-dot"></div>
+          <span>Technology</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent posts -->
+  <section class="section" style="padding-top:2rem">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem">
+      <div>
+        <div class="sec-label reveal">Recent</div>
+        <h2 class="sec-title reveal reveal-d1">Latest <em>writings</em></h2>
+      </div>
+    </div>
+    <div class="posts-grid">
+      <div class="card post-card reveal reveal-d1" onclick="openPost('p2')">
+        <div class="post-card-img"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYTBhMDAnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyNmOTczMTYnIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPGxpbmUgeDE9JzEwMCcgeTE9JzEwMCcgeDI9JzgwMCcgeTI9JzQwMCcgc3Ryb2tlPScjZjk3MzE2JyBzdHJva2Utd2lkdGg9JzMnIG9wYWNpdHk9JzAuMicvPgogIDxsaW5lIHgxPScyMDAnIHkxPSc4MCcgeDI9JzkwMCcgeTI9JzM4MCcgc3Ryb2tlPScjZjk3MzE2JyBzdHJva2Utd2lkdGg9JzInIG9wYWNpdHk9JzAuMTUnLz4KICA8bGluZSB4MT0nMCcgeTE9JzE4MCcgeDI9JzcwMCcgeTI9JzQ4MCcgc3Ryb2tlPScjZmJiZjI0JyBzdHJva2Utd2lkdGg9JzEuNScgb3BhY2l0eT0nMC4xMicvPgogIDxsaW5lIHgxPSc0MDAnIHkxPSc1MCcgeDI9JzE0MDAnIHkyPSc0NTAnIHN0cm9rZT0nI2ZiYmYyNCcgc3Ryb2tlLXdpZHRoPScyLjUnIG9wYWNpdHk9JzAuMTgnLz4KICA8Y2lyY2xlIGN4PSc1MDAnIGN5PScyNTAnIHI9JzYwJyBmaWxsPScjZjk3MzE2JyBvcGFjaXR5PScwLjE1Jy8+CiAgPHRleHQgeD0nNzAwJyB5PSc0NjAnIGZvbnQtZmFtaWx5PSdHZW9yZ2lhLHNlcmlmJyBmb250LXNpemU9JzE4JyBmaWxsPSd3aGl0ZScgdGV4dC1hbmNob3I9J21pZGRsZScgb3BhY2l0eT0nMC41JyBsZXR0ZXItc3BhY2luZz0nNCc+TElGRSAmIFJFRkxFQ1RJT048L3RleHQ+Cjwvc3ZnPg==" alt=""/><span class="cat-pill pill-life">Life</span></div>
+        <div class="post-card-body">
+          <span class="post-cat">Reflection</span>
+          <h3 class="post-card-title">On Slow Mornings and the Courage to Do Nothing</h3>
+          <p class="post-card-exc">In a culture addicted to productivity, choosing stillness is an act of quiet rebellion.</p>
+          <div class="post-card-meta"><span>Apr 28</span><span class="read-time">5 min</span></div>
+        </div>
+      </div>
+      <div class="card post-card reveal reveal-d2" onclick="openPost('p3')">
+        <div class="post-card-img"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwYTFhMGEnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyMyMmM1NWUnIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPGNpcmNsZSBjeD0nNTAwJyBjeT0nMjUwJyByPScyMDAnIGZpbGw9J25vbmUnIHN0cm9rZT0nIzIyYzU1ZScgc3Ryb2tlLXdpZHRoPScyJyBvcGFjaXR5PScwLjI1Jy8+CiAgPGNpcmNsZSBjeD0nNTAwJyBjeT0nMjUwJyByPScxNDAnIGZpbGw9J25vbmUnIHN0cm9rZT0nIzIyYzU1ZScgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuMTgnLz4KICA8Y2lyY2xlIGN4PSc1MDAnIGN5PScyNTAnIHI9JzgwJyBmaWxsPScjMjJjNTVlJyBvcGFjaXR5PScwLjInLz4KICA8Y2lyY2xlIGN4PSc1MDAnIGN5PScyNTAnIHI9JzM1JyBmaWxsPScjMjJjNTVlJyBvcGFjaXR5PScwLjQnLz4KICA8Y2lyY2xlIGN4PSc5MDAnIGN5PScyMDAnIHI9JzEyMCcgZmlsbD0nIzg2ZWZhYycgb3BhY2l0eT0nMC4xMicvPgogIDx0ZXh0IHg9JzcwMCcgeT0nNDYwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScxOCcgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIG9wYWNpdHk9JzAuNScgbGV0dGVyLXNwYWNpbmc9JzQnPkdST1dUSDwvdGV4dD4KPC9zdmc+" alt=""/><span class="cat-pill pill-growth">Growth</span></div>
+        <div class="post-card-body">
+          <span class="post-cat">Growth</span>
+          <h3 class="post-card-title">The Compound Effect Is Real. I Have the Evidence.</h3>
+          <p class="post-card-exc">Three years of daily writing, tracked. Here is what the data actually shows about small habits over time.</p>
+          <div class="post-card-meta"><span>Apr 15</span><span class="read-time">7 min</span></div>
+        </div>
+      </div>
+      <div class="card post-card reveal reveal-d3" onclick="openPost('p4')">
+        <div class="post-card-img"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYTBhMWEnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyNlYzQ4OTknIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPHJlY3QgeD0nMjAwJyB5PScxMDAnIHdpZHRoPScyMDAnIGhlaWdodD0nMjAwJyByeD0nOCcgZmlsbD0nI2VjNDg5OScgb3BhY2l0eT0nMC4yJyB0cmFuc2Zvcm09J3JvdGF0ZSgxNSwzMDAsMjAwKScvPgogIDxyZWN0IHg9JzQwMCcgeT0nMTUwJyB3aWR0aD0nMTYwJyBoZWlnaHQ9JzE2MCcgcng9JzgnIGZpbGw9JyNmOWE4ZDQnIG9wYWNpdHk9JzAuMjUnIHRyYW5zZm9ybT0ncm90YXRlKC04LDQ4MCwyMzApJy8+CiAgPHJlY3QgeD0nNjAwJyB5PScxMDAnIHdpZHRoPScxODAnIGhlaWdodD0nMTgwJyByeD0nOCcgZmlsbD0nI2VjNDg5OScgb3BhY2l0eT0nMC4xOCcgdHJhbnNmb3JtPSdyb3RhdGUoMjIsNjkwLDE5MCknLz4KICA8cmVjdCB4PSc5MDAnIHk9JzEzMCcgd2lkdGg9JzE0MCcgaGVpZ2h0PScxNDAnIHJ4PSc4JyBmaWxsPScjZjlhOGQ0JyBvcGFjaXR5PScwLjIyJyB0cmFuc2Zvcm09J3JvdGF0ZSgtMTIsOTcwLDIwMCknLz4KICA8dGV4dCB4PSc3MDAnIHk9JzQ2MCcgZm9udC1mYW1pbHk9J0dlb3JnaWEsc2VyaWYnIGZvbnQtc2l6ZT0nMTgnIGZpbGw9J3doaXRlJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBvcGFjaXR5PScwLjUnIGxldHRlci1zcGFjaW5nPSc0Jz5DUkVBVElWRSBXT1JLPC90ZXh0Pgo8L3N2Zz4=" alt=""/><span class="cat-pill pill-creative">Creative</span></div>
+        <div class="post-card-body">
+          <span class="post-cat">Creative Work</span>
+          <h3 class="post-card-title">Why I Write Things No One Might Ever Read</h3>
+          <p class="post-card-exc">An honest look at writing for the drawer, and why the private notebook might be more valuable than the published post.</p>
+          <div class="post-card-meta"><span>Apr 3</span><span class="read-time">6 min</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Topics -->
+  <section class="section" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="tc reveal" style="margin-bottom:.3rem">
+      <div class="sec-label" style="justify-content:center">Explore</div>
+      <h2 class="sec-title" style="text-align:center">Browse by <em>topic</em></h2>
+    </div>
+    <div class="topics-grid">
+      <div class="topic-card reveal reveal-d1" style="--topic-color:#3b82f6" onclick="filterAndGo('Technology')">
+        <div class="topic-letter">T</div>
+        <div class="topic-name">Technology</div>
+        <div class="topic-count">12 articles</div>
+      </div>
+      <div class="topic-card reveal reveal-d2" style="--topic-color:#f97316" onclick="filterAndGo('Life')">
+        <div class="topic-letter">L</div>
+        <div class="topic-name">Life &amp; Reflection</div>
+        <div class="topic-count">9 articles</div>
+      </div>
+      <div class="topic-card reveal reveal-d3" style="--topic-color:#22c55e" onclick="filterAndGo('Growth')">
+        <div class="topic-letter">G</div>
+        <div class="topic-name">Growth</div>
+        <div class="topic-count">11 articles</div>
+      </div>
+      <div class="topic-card reveal reveal-d4" style="--topic-color:#ec4899" onclick="filterAndGo('Creative')">
+        <div class="topic-letter">C</div>
+        <div class="topic-name">Creative Work</div>
+        <div class="topic-count">7 articles</div>
+      </div>
+      <div class="topic-card reveal reveal-d1" style="--topic-color:#a855f7" onclick="filterAndGo('Philosophy')">
+        <div class="topic-letter">P</div>
+        <div class="topic-name">Philosophy</div>
+        <div class="topic-count">6 articles</div>
+      </div>
+      <div class="topic-card reveal reveal-d2" style="--topic-color:#14b8a6" onclick="filterAndGo('Health')">
+        <div class="topic-letter">H</div>
+        <div class="topic-name">Health &amp; Mind</div>
+        <div class="topic-count">5 articles</div>
+      </div>
+      <div class="topic-card reveal reveal-d3" style="--topic-color:#eab308" onclick="filterAndGo('Learning')">
+        <div class="topic-letter">L</div>
+        <div class="topic-name">Learning</div>
+        <div class="topic-count">8 articles</div>
+      </div>
+      <div class="topic-card reveal reveal-d4" style="--topic-color:#a855f7" onclick="filterAndGo('Books')">
+        <div class="topic-letter">B</div>
+        <div class="topic-name">Books &amp; Reading</div>
+        <div class="topic-count">10 articles</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <div class="nl-bar">
+    <div class="nl-inner">
+      <div class="nl-text reveal">
+        <div class="sec-label">Newsletter</div>
+        <h2 class="sec-title" style="font-size:1.8rem">Get new posts <em>in your inbox</em></h2>
+        <p>No spam. Just good writing, every time I publish something worth sharing.</p>
+      </div>
+      <div class="reveal reveal-d2">
+        <div class="nl-form-wrap">
+          <div class="nl-form">
+            <input class="nl-input" id="nlEmail" placeholder="your@email.com" type="email"/>
+            <button class="btn btn-orange" style="padding:.72rem 1.6rem;font-size:.82rem" onclick="nlSubmit()">Subscribe</button>
+          </div>
+          <p class="nl-note" id="nlNote">&#x2713; &nbsp; Free. No spam. Unsubscribe anytime.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  FOOTER_BLOCK
+
+</div><!-- /home -->
+
+<!-- ╔══════════════════════════════════
+     BLOG PAGE
+══════════════════════════════════╗ -->
+<div id="page-blog" class="page">
+  <div class="blog-hero">
+    <div class="sec-label reveal">The Archive</div>
+    <h1 class="reveal reveal-d1">All <em>Posts</em></h1>
+    <p class="reveal reveal-d2">Everything I've written — sorted newest first. Filter by tag or search above.</p>
+  </div>
+  <div class="blog-layout">
+    <div class="blog-posts" id="blogPostsList">
+      <!-- posts injected by JS -->
+    </div>
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">Filter by Tag</div>
+        <div class="tag-cloud" id="tagCloud"></div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-title">Popular Posts</div>
+        <div id="popularList"></div>
+      </div>
+      <div class="sidebar-card" style="background:linear-gradient(135deg,rgba(255,107,53,.08),rgba(255,107,53,.03));border-color:rgba(255,107,53,.2)">
+        <div class="sidebar-title">Newsletter</div>
+        <p style="font-size:.83rem;color:var(--muted);margin-bottom:1rem;line-height:1.6">New posts straight to your inbox.</p>
+        <div class="nl-form" style="flex-direction:column;gap:.6rem">
+          <input class="nl-input" id="sideNlEmail" placeholder="your@email.com" type="email" style="border-radius:var(--r)"/>
+          <button class="btn btn-orange" style="border-radius:var(--r);padding:.68rem;font-size:.8rem;justify-content:center" onclick="sideNlSubmit()">Subscribe</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+  FOOTER_BLOCK
+</div>
+
+<!-- ╔══════════════════════════════════
+     ABOUT PAGE
+══════════════════════════════════╗ -->
+<div id="page-about" class="page">
+  <section class="about-hero">
+    <div class="about-grid">
+      <div class="about-img-wrap reveal">
+        <img class="about-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSczMDAnIGhlaWdodD0nMzAwJz4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0nZycgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMyYTFmM2QnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjNGEzYTZiJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nMzAwJyBoZWlnaHQ9JzMwMCcgZmlsbD0ndXJsKCNnKScvPgogIDxlbGxpcHNlIGN4PScxNTAnIGN5PScxMzUnIHJ4PSc1Micgcnk9JzYwJyBmaWxsPScjZThkNWI4JyBvcGFjaXR5PScwLjk1Jy8+CiAgPGVsbGlwc2UgY3g9JzE1MCcgY3k9Jzk2JyByeD0nNTgnIHJ5PSczOCcgZmlsbD0nIzFhMGUwNicgb3BhY2l0eT0nMC44OCcvPgogIDxwYXRoIGQ9J003MCwyNjAgUTExMCwyMjggMTUwLDIzNCBRMTkwLDIyOCAyMzAsMjYwIEwyMzUsMzAwIEw2NSwzMDBaJyBmaWxsPScjM2EyZDVhJyBvcGFjaXR5PScwLjg1Jy8+CiAgPGVsbGlwc2UgY3g9JzEzNicgY3k9JzEzNScgcng9JzcnIHJ5PSc4JyBmaWxsPScjMmExYTA4Jy8+CiAgPGVsbGlwc2UgY3g9JzE2NCcgY3k9JzEzNScgcng9JzcnIHJ5PSc4JyBmaWxsPScjMmExYTA4Jy8+CiAgPHBhdGggZD0nTTEzNiwxNTggUTE1MCwxNzAgMTY0LDE1OCcgc3Ryb2tlPScjOGE1YTJhJyBzdHJva2Utd2lkdGg9JzIuNScgZmlsbD0nbm9uZScgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJy8+Cjwvc3ZnPg==" alt="Azzam"/>
+        <div class="about-img-accent"></div>
+        <div class="about-img-accent2"></div>
+      </div>
+      <div class="about-text reveal reveal-d2">
+        <div class="sec-label">Hello, I'm</div>
+        <h1 class="sec-title" style="font-size:clamp(2.2rem,4vw,3.5rem)">Azzam —<br/><em>writer, thinker,</em><br/>curious human.</h1>
+        <p>I write about the things I can't stop thinking about. Technology and how it reshapes us. The quiet discipline of personal growth. Books that rearranged my worldview. The strange, beautiful work of being alive and paying attention.</p>
+        <p>This blog is my public notebook — unfinished ideas welcome, polish not guaranteed. I believe in writing as a way of thinking, not just reporting thought.</p>
+        <p>Based in Malaysia. Fuelled by strong coffee and uncomfortable questions.</p>
+        <div class="about-skills">
+          <span class="skill-tag">Writing</span><span class="skill-tag">Technology</span>
+          <span class="skill-tag">Philosophy</span><span class="skill-tag">Personal Growth</span>
+          <span class="skill-tag">Books</span><span class="skill-tag">Learning</span>
+          <span class="skill-tag">Creative Work</span><span class="skill-tag">Reflection</span>
+        </div>
+        <div class="about-links">
+          <a class="social-link" href="#">Twitter / X</a>
+          <a class="social-link" href="#">LinkedIn</a>
+          <a class="social-link" href="#">GitHub</a>
+          <button class="social-link" onclick="showPage('contact')">Email Me</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section style="padding:0 5vw 5rem">
+    <div style="max-width:860px;margin:0 auto">
+      <div class="sec-label reveal">Journey</div>
+      <h2 class="sec-title reveal reveal-d1" style="margin-bottom:2.5rem">How I got <em>here</em></h2>
+      <div class="timeline">
+        <div class="timeline-item reveal">
+          <div class="timeline-year">2026</div>
+          <div class="timeline-content"><h4>Still Writing</h4><p>Continuing to publish on this blog, exploring new topics and refining old ideas. Building in public, learning in public.</p></div>
+        </div>
+        <div class="timeline-item reveal reveal-d1">
+          <div class="timeline-year">2024</div>
+          <div class="timeline-content"><h4>Found My Voice</h4><p>After two years of writing privately, I decided to publish. The first post got three readers — one of them was my mother. The second post found an audience.</p></div>
+        </div>
+        <div class="timeline-item reveal reveal-d2">
+          <div class="timeline-year">2022</div>
+          <div class="timeline-content"><h4>Started Writing Daily</h4><p>Began a daily writing practice after reading Austin Kleon's <em>Show Your Work</em>. Most of it was terrible. Some of it wasn't. That was enough to continue.</p></div>
+        </div>
+        <div class="timeline-item reveal reveal-d3">
+          <div class="timeline-year">2020</div>
+          <div class="timeline-content"><h4>Fell in Love with Reading</h4><p>Lockdown and a slow internet connection taught me to read deeply again. Books replaced the scroll. Ideas started to accumulate.</p></div>
+        </div>
+        <div class="timeline-item reveal reveal-d4">
+          <div class="timeline-year">2018</div>
+          <div class="timeline-content"><h4>The Beginning</h4><p>Started asking questions I didn't have answers to. Turns out that's the best place to start.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  FOOTER_BLOCK
+</div>
+
+<!-- ╔══════════════════════════════════
+     CONTACT PAGE
+══════════════════════════════════╗ -->
+<div id="page-contact" class="page">
+  <div class="contact-hero">
+    <div class="sec-label reveal">Get in Touch</div>
+    <h1 class="sec-title reveal reveal-d1" style="font-size:clamp(2.2rem,4vw,3.5rem)">Let's <em>talk</em></h1>
+    <p class="reveal reveal-d2" style="color:var(--muted);font-size:.97rem;margin-top:.6rem">I read every message. Response time is usually 1–2 days.</p>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-left reveal">
+      <h2>Say Hello</h2>
+      <p>Whether you want to discuss an idea, collaborate on something, give feedback on a post, or just say hi — I'm genuinely happy to hear from you.</p>
+      <div class="contact-item">
+        <span class="c-label">Email</span>
+        <span class="c-value">hello@azzam.blog</span>
+      </div>
+      <div class="contact-item">
+        <span class="c-label">Based in</span>
+        <span class="c-value">Johor, Malaysia</span>
+      </div>
+      <div class="contact-item">
+        <span class="c-label">Response time</span>
+        <span class="c-value">1 – 2 business days</span>
+      </div>
+      <div style="margin-top:2rem">
+        <div class="c-label" style="margin-bottom:.8rem">Find me on</div>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <a class="social-link" href="#">Twitter</a>
+          <a class="social-link" href="#">LinkedIn</a>
+          <a class="social-link" href="#">GitHub</a>
+        </div>
+      </div>
+    </div>
+    <div class="contact-form reveal reveal-d2">
+      <div class="success-msg" id="contactSuccess">Message sent. I'll get back to you soon.</div>
+      <div class="form-row">
+        <div class="fg"><label>First Name</label><input id="cfn" type="text" placeholder="Ada"/></div>
+        <div class="fg"><label>Last Name</label><input id="cln" type="text" placeholder="Lovelace"/></div>
+      </div>
+      <div class="fg"><label>Email</label><input id="cem" type="email" placeholder="ada@email.com"/></div>
+      <div class="fg"><label>Subject</label>
+        <select id="csub">
+          <option value="">Choose a topic</option>
+          <option>Say Hello</option>
+          <option>Feedback on a Post</option>
+          <option>Collaboration</option>
+          <option>Guest Post Pitch</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="fg"><label>Message</label><textarea id="cmsg" placeholder="What's on your mind?"></textarea></div>
+      <button class="form-submit" onclick="submitContact()">Send Message &nbsp; &rarr;</button>
+    </div>
+  </div>
+  FOOTER_BLOCK
+</div>
+
+<!-- ─── FOOTER TEMPLATE ─── -->
+<template id="footerTpl">
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div style="display:flex;align-items:center;gap:.8rem">
+        <div style="width:32px;height:32px;border-radius:50%;overflow:hidden;border:1.5px solid var(--orange)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSczMDAnIGhlaWdodD0nMzAwJz4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0nZycgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMyYTFmM2QnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjNGEzYTZiJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nMzAwJyBoZWlnaHQ9JzMwMCcgZmlsbD0ndXJsKCNnKScvPgogIDxlbGxpcHNlIGN4PScxNTAnIGN5PScxMzUnIHJ4PSc1Micgcnk9JzYwJyBmaWxsPScjZThkNWI4JyBvcGFjaXR5PScwLjk1Jy8+CiAgPGVsbGlwc2UgY3g9JzE1MCcgY3k9Jzk2JyByeD0nNTgnIHJ5PSczOCcgZmlsbD0nIzFhMGUwNicgb3BhY2l0eT0nMC44OCcvPgogIDxwYXRoIGQ9J003MCwyNjAgUTExMCwyMjggMTUwLDIzNCBRMTkwLDIyOCAyMzAsMjYwIEwyMzUsMzAwIEw2NSwzMDBaJyBmaWxsPScjM2EyZDVhJyBvcGFjaXR5PScwLjg1Jy8+CiAgPGVsbGlwc2UgY3g9JzEzNicgY3k9JzEzNScgcng9JzcnIHJ5PSc4JyBmaWxsPScjMmExYTA4Jy8+CiAgPGVsbGlwc2UgY3g9JzE2NCcgY3k9JzEzNScgcng9JzcnIHJ5PSc4JyBmaWxsPScjMmExYTA4Jy8+CiAgPHBhdGggZD0nTTEzNiwxNTggUTE1MCwxNzAgMTY0LDE1OCcgc3Ryb2tlPScjOGE1YTJhJyBzdHJva2Utd2lkdGg9JzIuNScgZmlsbD0nbm9uZScgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJy8+Cjwvc3ZnPg==" style="width:100%;height:100%;object-fit:cover" alt=""/></div>
+        <span style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:white">Azzam</span>
+      </div>
+      <p>A personal blog about ideas, growth, technology and the art of paying attention.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><button onclick="showPage('home')">Home</button></li>
+        <li><button onclick="showPage('blog')">All Posts</button></li>
+        <li><button onclick="showPage('about')">About</button></li>
+        <li><button onclick="showPage('contact')">Contact</button></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Topics</h4>
+      <ul>
+        <li><button onclick="filterAndGo('Technology')">Technology</button></li>
+        <li><button onclick="filterAndGo('Growth')">Growth</button></li>
+        <li><button onclick="filterAndGo('Books')">Books</button></li>
+        <li><button onclick="filterAndGo('Philosophy')">Philosophy</button></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <ul>
+        <li><a href="#">Twitter / X</a></li>
+        <li><a href="#">LinkedIn</a></li>
+        <li><a href="#">GitHub</a></li>
+        <li><a href="#">RSS Feed</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&#169; 2026 Azzam. All rights reserved.</span>
+    <span>Built with curiosity &amp; coffee &nbsp; &#x2615;</span>
+    <button onclick="window.scrollTo({top:0,behavior:'smooth'})" style="background:none;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;transition:color .2s" onmouseover="this.style.color='var(--orange)'" onmouseout="this.style.color='var(--muted)'">&#x2191; Top</button>
+  </div>
+</footer>
+</template>
+
+<script>
+// ─── POSTS DATA ───
+const POSTS = [
+  {id:'p1',cat:'Technology',pill:'pill-tech',title:'How I Learned to Stop Worrying and Love Constraints',exc:'The best creative work of my life came from the most limited circumstances. Constraints are not the enemy of creativity — they are its engine.',date:'May 2026',read:'8 min',img:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwZjE3MmEnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyMzYjgyZjYnIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPHBhdGggZD0nTTAgMjUwIFExNzUgMTUwIDM1MCAyNTAgUTUyNSAzNTAgNzAwIDI1MCBRODc1IDE1MCAxMDUwIDI1MCBRMTIyNSAzNTAgMTQwMCAyNTAgTDE0MDAgNTAwIEwwIDUwMFonIGZpbGw9JyMwNmI2ZDQnIG9wYWNpdHk9JzAuMjUnLz4KICA8cGF0aCBkPSdNMCAzMDAgUTE3NSAyMDAgMzUwIDMwMCBRNTI1IDQwMCA3MDAgMzAwIFE4NzUgMjAwIDEwNTAgMzAwIFExMjI1IDQwMCAxNDAwIDMwMCBMMTQwMCA1MDAgTDAgNTAwWicgZmlsbD0nIzA2YjZkNCcgb3BhY2l0eT0nMC4xNScvPgogIDxjaXJjbGUgY3g9JzcwMCcgY3k9JzIyMCcgcj0nODAnIGZpbGw9JyMzYjgyZjYnIG9wYWNpdHk9JzAuMicvPgogIDxjaXJjbGUgY3g9JzcwMCcgY3k9JzIyMCcgcj0nNDUnIGZpbGw9JyMzYjgyZjYnIG9wYWNpdHk9JzAuMzUnLz4KICA8dGV4dCB4PSc3MDAnIHk9JzQ2MCcgZm9udC1mYW1pbHk9J0dlb3JnaWEsc2VyaWYnIGZvbnQtc2l6ZT0nMTgnIGZpbGw9J3doaXRlJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBvcGFjaXR5PScwLjUnIGxldHRlci1zcGFjaW5nPSc0Jz5URUNITk9MT0dZPC90ZXh0Pgo8L3N2Zz4=',tags:['technology','creativity','constraints'],
+   body:`<p>There is a particular kind of freedom that only emerges when you have no freedom at all.</p>
+   <p>I wrote my most-shared piece on a borrowed laptop with a cracked screen, sitting in an airport with forty minutes of battery life remaining. No internet access. No research tabs. Just a blank document and a deadline I had invented for myself.</p>
+   <blockquote>The quality of a decision is not determined by the resources available — it is determined by what you decide to do with what you have.</blockquote>
+   <h2>The Paradox of Infinite Choice</h2>
+   <p>When we have unlimited tools, unlimited time, unlimited options — we often produce nothing. The blank canvas terrifies. The endless possibilities paralyse. We spend our time optimising the conditions for work rather than doing the work itself.</p>
+   <p>The psychologist Barry Schwartz called this the "paradox of choice" — the counterintuitive finding that more options lead to less satisfaction and less action. We know this from our own experience. The restaurant with a twelve-page menu is harder to order from than the one with five dishes.</p>
+   <h2>What Constraints Actually Do</h2>
+   <p>Constraints force prioritisation. When you have one hour to write something, you cannot spend fifty minutes deciding which font to use. The trivialities evaporate. The essential remains.</p>
+   <p>Constraints force creativity. When you cannot solve a problem the obvious way, you must find another way. That other way is often better. <code>necessity.force(innovation)</code> is not just a cliché — it is a reliable feature of how minds work under pressure.</p>
+   <p>Constraints create identity. "I write on a 500-word limit" is a creative identity. It shapes not just output but thinking. The limit becomes the form.</p>
+   <h2>How to Use This</h2>
+   <p>The practical application is simple but requires deliberate practice. Set artificial constraints before you begin any creative project. Give yourself half the time you think you need. Use only the tools you have, not the ones you wish you had. Ship before you think it is ready.</p>
+   <p>The constraint you resent in the moment is usually the one that made the work possible.</p>`},
+
+  {id:'p2',cat:'Life',pill:'pill-life',title:'On Slow Mornings and the Courage to Do Nothing',exc:'In a culture addicted to productivity, choosing stillness is an act of quiet rebellion.',date:'Apr 28, 2026',read:'5 min',img:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYTBhMDAnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyNmOTczMTYnIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPGxpbmUgeDE9JzEwMCcgeTE9JzEwMCcgeDI9JzgwMCcgeTI9JzQwMCcgc3Ryb2tlPScjZjk3MzE2JyBzdHJva2Utd2lkdGg9JzMnIG9wYWNpdHk9JzAuMicvPgogIDxsaW5lIHgxPScyMDAnIHkxPSc4MCcgeDI9JzkwMCcgeTI9JzM4MCcgc3Ryb2tlPScjZjk3MzE2JyBzdHJva2Utd2lkdGg9JzInIG9wYWNpdHk9JzAuMTUnLz4KICA8bGluZSB4MT0nMCcgeTE9JzE4MCcgeDI9JzcwMCcgeTI9JzQ4MCcgc3Ryb2tlPScjZmJiZjI0JyBzdHJva2Utd2lkdGg9JzEuNScgb3BhY2l0eT0nMC4xMicvPgogIDxsaW5lIHgxPSc0MDAnIHkxPSc1MCcgeDI9JzE0MDAnIHkyPSc0NTAnIHN0cm9rZT0nI2ZiYmYyNCcgc3Ryb2tlLXdpZHRoPScyLjUnIG9wYWNpdHk9JzAuMTgnLz4KICA8Y2lyY2xlIGN4PSc1MDAnIGN5PScyNTAnIHI9JzYwJyBmaWxsPScjZjk3MzE2JyBvcGFjaXR5PScwLjE1Jy8+CiAgPHRleHQgeD0nNzAwJyB5PSc0NjAnIGZvbnQtZmFtaWx5PSdHZW9yZ2lhLHNlcmlmJyBmb250LXNpemU9JzE4JyBmaWxsPSd3aGl0ZScgdGV4dC1hbmNob3I9J21pZGRsZScgb3BhY2l0eT0nMC41JyBsZXR0ZXItc3BhY2luZz0nNCc+TElGRSAmIFJFRkxFQ1RJT048L3RleHQ+Cjwvc3ZnPg==',tags:['life','mindfulness','mornings'],
+   body:`<p>It took me three years to allow myself a slow morning. Three years of 5am alarms and productivity frameworks and optimised schedules before I asked the obvious question: who exactly am I optimising for?</p>
+   <blockquote>Busyness is a form of laziness — lazy thinking and indiscriminate action. Being perpetually busy is a way of avoiding the scary work of deciding what actually matters.</blockquote>
+   <h2>The Morning as Battleground</h2>
+   <p>The morning has become a site of cultural warfare. On one side: the cold-plunge, journal-before-sunrise brigade. On the other: the "sleep is a weapon" advocates. Both sides have made the morning into a performance — a set of rituals that signal discipline rather than produce it.</p>
+   <p>I stepped off that battlefield. Now I wake up slowly. I make coffee with the attention I used to spend on my inbox. I sit with the window open and watch light change. Some mornings I read. Some mornings I just exist.</p>
+   <h2>What Stillness Actually Produces</h2>
+   <p>The paradox is that my slow mornings have made the rest of my days more productive — not because stillness is secretly a productivity hack, but because they have clarified what I actually want to do.</p>
+   <p>When you give yourself permission to do nothing, you discover what you actually want to do instead. That discovery is worth more than any morning routine.</p>`},
+
+  {id:'p3',cat:'Growth',pill:'pill-growth',title:'The Compound Effect Is Real. I Have the Evidence.',exc:'Three years of daily writing, tracked. Here is what the data actually shows about small habits over time.',date:'Apr 15, 2026',read:'7 min',img:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwYTFhMGEnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyMyMmM1NWUnIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPGNpcmNsZSBjeD0nNTAwJyBjeT0nMjUwJyByPScyMDAnIGZpbGw9J25vbmUnIHN0cm9rZT0nIzIyYzU1ZScgc3Ryb2tlLXdpZHRoPScyJyBvcGFjaXR5PScwLjI1Jy8+CiAgPGNpcmNsZSBjeD0nNTAwJyBjeT0nMjUwJyByPScxNDAnIGZpbGw9J25vbmUnIHN0cm9rZT0nIzIyYzU1ZScgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuMTgnLz4KICA8Y2lyY2xlIGN4PSc1MDAnIGN5PScyNTAnIHI9JzgwJyBmaWxsPScjMjJjNTVlJyBvcGFjaXR5PScwLjInLz4KICA8Y2lyY2xlIGN4PSc1MDAnIGN5PScyNTAnIHI9JzM1JyBmaWxsPScjMjJjNTVlJyBvcGFjaXR5PScwLjQnLz4KICA8Y2lyY2xlIGN4PSc5MDAnIGN5PScyMDAnIHI9JzEyMCcgZmlsbD0nIzg2ZWZhYycgb3BhY2l0eT0nMC4xMicvPgogIDx0ZXh0IHg9JzcwMCcgeT0nNDYwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScxOCcgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIG9wYWNpdHk9JzAuNScgbGV0dGVyLXNwYWNpbmc9JzQnPkdST1dUSDwvdGV4dD4KPC9zdmc+',tags:['growth','habits','writing'],
+   body:`<p>I have written something every single day for 1,095 days. I have the spreadsheet to prove it — 1,095 rows, each with a date, a word count, and a one-sentence description of what I wrote.</p>
+   <p>The first six months produced approximately nothing anyone would want to read. The writing was stilted, self-conscious, and obsessed with its own mediocrity. The middle period — months seven through eighteen — produced occasional flashes of something real, surrounded by a lot of filler.</p>
+   <blockquote>The gap between the work you want to make and the work you can make is only closed by volume. There is no shortcut through it.</blockquote>
+   <h2>What the Data Shows</h2>
+   <p>Looking at the spreadsheet with three years of hindsight, the pattern is clear. Every piece I am genuinely proud of came after month eighteen. Not because I became more disciplined — my discipline was already established. But because the craft had accumulated enough repetitions to become reliable.</p>
+   <p>The compound effect does not announce itself. It does not arrive on a particular Tuesday and say "congratulations, you've now crossed the threshold." It accumulates invisibly until, one day, you look back at your early work and realise you can no longer write that badly. The floor has risen.</p>
+   <h2>The Honest Advice</h2>
+   <p>Do the thing every day. Not when you feel like it — every day. Track it, not to gamify it, but so that the streak becomes a data point rather than an identity. When you miss a day, you missed a day. The data shows it. The practice continues.</p>`},
+
+  {id:'p4',cat:'Creative',pill:'pill-creative',title:'Why I Write Things No One Might Ever Read',exc:'An honest look at writing for the drawer, and why the private notebook might be more valuable than the published post.',date:'Apr 3, 2026',read:'6 min',img:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYTBhMWEnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyNlYzQ4OTknIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPHJlY3QgeD0nMjAwJyB5PScxMDAnIHdpZHRoPScyMDAnIGhlaWdodD0nMjAwJyByeD0nOCcgZmlsbD0nI2VjNDg5OScgb3BhY2l0eT0nMC4yJyB0cmFuc2Zvcm09J3JvdGF0ZSgxNSwzMDAsMjAwKScvPgogIDxyZWN0IHg9JzQwMCcgeT0nMTUwJyB3aWR0aD0nMTYwJyBoZWlnaHQ9JzE2MCcgcng9JzgnIGZpbGw9JyNmOWE4ZDQnIG9wYWNpdHk9JzAuMjUnIHRyYW5zZm9ybT0ncm90YXRlKC04LDQ4MCwyMzApJy8+CiAgPHJlY3QgeD0nNjAwJyB5PScxMDAnIHdpZHRoPScxODAnIGhlaWdodD0nMTgwJyByeD0nOCcgZmlsbD0nI2VjNDg5OScgb3BhY2l0eT0nMC4xOCcgdHJhbnNmb3JtPSdyb3RhdGUoMjIsNjkwLDE5MCknLz4KICA8cmVjdCB4PSc5MDAnIHk9JzEzMCcgd2lkdGg9JzE0MCcgaGVpZ2h0PScxNDAnIHJ4PSc4JyBmaWxsPScjZjlhOGQ0JyBvcGFjaXR5PScwLjIyJyB0cmFuc2Zvcm09J3JvdGF0ZSgtMTIsOTcwLDIwMCknLz4KICA8dGV4dCB4PSc3MDAnIHk9JzQ2MCcgZm9udC1mYW1pbHk9J0dlb3JnaWEsc2VyaWYnIGZvbnQtc2l6ZT0nMTgnIGZpbGw9J3doaXRlJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBvcGFjaXR5PScwLjUnIGxldHRlci1zcGFjaW5nPSc0Jz5DUkVBVElWRSBXT1JLPC90ZXh0Pgo8L3N2Zz4=',tags:['creative','writing','craft'],
+   body:`<p>I have twelve notebooks I will never publish. They contain half-finished essays, character sketches, observations about the texture of particular afternoons, arguments I rehearsed and then abandoned. They will outlast me, probably unread.</p>
+   <p>I used to feel guilty about this. All that writing, and for what? But I have changed my view. I now think that the unpublished writing is not a failure state of the published writing — it is the substrate from which published writing grows.</p>
+   <blockquote>The ratio of private to public writing should be roughly ten to one. Most of the work is underground, invisible, feeding the root system.</blockquote>
+   <h2>Writing as Thinking</h2>
+   <p>When I write in a notebook, I am not trying to communicate. I am trying to think. The act of forming sentences forces a kind of clarity that thinking in the abstract resists. Ideas that seem complete in my head reveal their gaps on the page.</p>
+   <p>This is different from writing for an audience. Audience-directed writing involves performance — you are shaping not just the idea but its reception. Private writing removes that layer. The idea can be half-formed, wrong, embarrassing. It can go nowhere. And sometimes, from that nowhere, something arrives.</p>`},
+
+  {id:'p5',cat:'Philosophy',pill:'pill-philosophy',title:'The Examined Life Is Not Always a Comfortable One',exc:'Socrates was right about self-examination being necessary. He did not mention that it is also frequently unpleasant.',date:'Mar 22, 2026',read:'9 min',img:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwZjBmMWEnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyM4YjVjZjYnIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPHBhdGggZD0nTTAgMjUwIFExNzUgMTUwIDM1MCAyNTAgUTUyNSAzNTAgNzAwIDI1MCBRODc1IDE1MCAxMDUwIDI1MCBRMTIyNSAzNTAgMTQwMCAyNTAgTDE0MDAgNTAwIEwwIDUwMFonIGZpbGw9JyNjNGI1ZmQnIG9wYWNpdHk9JzAuMjUnLz4KICA8cGF0aCBkPSdNMCAzMDAgUTE3NSAyMDAgMzUwIDMwMCBRNTI1IDQwMCA3MDAgMzAwIFE4NzUgMjAwIDEwNTAgMzAwIFExMjI1IDQwMCAxNDAwIDMwMCBMMTQwMCA1MDAgTDAgNTAwWicgZmlsbD0nI2M0YjVmZCcgb3BhY2l0eT0nMC4xNScvPgogIDxjaXJjbGUgY3g9JzcwMCcgY3k9JzIyMCcgcj0nODAnIGZpbGw9JyM4YjVjZjYnIG9wYWNpdHk9JzAuMicvPgogIDxjaXJjbGUgY3g9JzcwMCcgY3k9JzIyMCcgcj0nNDUnIGZpbGw9JyM4YjVjZjYnIG9wYWNpdHk9JzAuMzUnLz4KICA8dGV4dCB4PSc3MDAnIHk9JzQ2MCcgZm9udC1mYW1pbHk9J0dlb3JnaWEsc2VyaWYnIGZvbnQtc2l6ZT0nMTgnIGZpbGw9J3doaXRlJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBvcGFjaXR5PScwLjUnIGxldHRlci1zcGFjaW5nPSc0Jz5QSElMT1NPUEhZPC90ZXh0Pgo8L3N2Zz4=',tags:['philosophy','self-knowledge','thinking'],
+   body:`<p>Socrates told the Athenians that the unexamined life is not worth living. He did not mention — perhaps strategically — that the examined life frequently reveals things you would rather not have found.</p>
+   <p>I have spent several years in reasonably serious self-examination. I have read the Stoics, kept a journal, done the therapy, gone on the retreats. The consistent finding is this: I am not who I thought I was. I am simultaneously better and worse, more contradictory, more contingent, more formed by accident than I had assumed.</p>
+   <blockquote>Self-knowledge is not a destination. It is a practice of perpetual mild discomfort. The goal is not to arrive but to keep looking honestly.</blockquote>
+   <h2>What the Examined Life Actually Requires</h2>
+   <p>It requires what psychologists call "epistemic humility" — the willingness to hold your beliefs about yourself loosely enough to update them. Most of us carry a self-image assembled in adolescence, maintained by selective attention, and defended with remarkable energy against any evidence that might complicate it.</p>
+   <p>The examined life asks you to put that self-image on the table and look at it honestly. To ask not "am I a good person" — which is almost always answered "yes" by the person doing the asking — but "in what specific ways do I act against my own stated values, and why?"</p>`},
+
+  {id:'p6',cat:'Health',pill:'pill-health',title:'What Running Taught Me About the Rest of My Life',exc:'I took up running at 28 reluctantly. Two years later, the lessons have migrated into everything else.',date:'Mar 10, 2026',read:'6 min',img:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMwYTE1MTAnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyMxNGI4YTYnIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPGxpbmUgeDE9JzEwMCcgeTE9JzEwMCcgeDI9JzgwMCcgeTI9JzQwMCcgc3Ryb2tlPScjMTRiOGE2JyBzdHJva2Utd2lkdGg9JzMnIG9wYWNpdHk9JzAuMicvPgogIDxsaW5lIHgxPScyMDAnIHkxPSc4MCcgeDI9JzkwMCcgeTI9JzM4MCcgc3Ryb2tlPScjMTRiOGE2JyBzdHJva2Utd2lkdGg9JzInIG9wYWNpdHk9JzAuMTUnLz4KICA8bGluZSB4MT0nMCcgeTE9JzE4MCcgeDI9JzcwMCcgeTI9JzQ4MCcgc3Ryb2tlPScjNWVlYWQ0JyBzdHJva2Utd2lkdGg9JzEuNScgb3BhY2l0eT0nMC4xMicvPgogIDxsaW5lIHgxPSc0MDAnIHkxPSc1MCcgeDI9JzE0MDAnIHkyPSc0NTAnIHN0cm9rZT0nIzVlZWFkNCcgc3Ryb2tlLXdpZHRoPScyLjUnIG9wYWNpdHk9JzAuMTgnLz4KICA8Y2lyY2xlIGN4PSc1MDAnIGN5PScyNTAnIHI9JzYwJyBmaWxsPScjMTRiOGE2JyBvcGFjaXR5PScwLjE1Jy8+CiAgPHRleHQgeD0nNzAwJyB5PSc0NjAnIGZvbnQtZmFtaWx5PSdHZW9yZ2lhLHNlcmlmJyBmb250LXNpemU9JzE4JyBmaWxsPSd3aGl0ZScgdGV4dC1hbmNob3I9J21pZGRsZScgb3BhY2l0eT0nMC41JyBsZXR0ZXItc3BhY2luZz0nNCc+SEVBTFRIPC90ZXh0Pgo8L3N2Zz4=',tags:['health','running','habits'],
+   body:`<p>I did not want to run. I started because a doctor mentioned my resting heart rate in a tone that suggested it was not entirely ideal. Running was the most efficient solution. I treated it like a task to complete.</p>
+   <p>That was two years ago. Running is now the most consistent practice in my life, and the lessons I've learned from it have migrated into everything else I do.</p>
+   <blockquote>The body knows things the mind resists. Running taught me to listen to it before it starts shouting.</blockquote>
+   <h2>The Lesson About Pacing</h2>
+   <p>Every beginner runner makes the same mistake: they start too fast. They have energy at the beginning, they feel good, they push the pace — and they blow up halfway through and have to walk. Or stop entirely.</p>
+   <p>The solution is counter-intuitive. You run slower than feels necessary at the start. Embarrassingly slow. Slower than walking almost feels like. And you maintain that pace until running becomes sustainable.</p>
+   <p>I have applied this to every project I start now. The sprint at the beginning always produces the collapse in the middle. The boring, sustainable pace produces the finish line.</p>`},
+
+  {id:'p7',cat:'Learning',pill:'pill-learning',title:'How to Actually Remember What You Read',exc:'I read 40 books last year. Here is the honest system that made the ideas stick instead of evaporating.',date:'Feb 28, 2026',read:'8 min',img:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxYTEwMDAnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyNlYWIzMDgnIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPGNpcmNsZSBjeD0nNTAwJyBjeT0nMjUwJyByPScyMDAnIGZpbGw9J25vbmUnIHN0cm9rZT0nI2VhYjMwOCcgc3Ryb2tlLXdpZHRoPScyJyBvcGFjaXR5PScwLjI1Jy8+CiAgPGNpcmNsZSBjeD0nNTAwJyBjeT0nMjUwJyByPScxNDAnIGZpbGw9J25vbmUnIHN0cm9rZT0nI2VhYjMwOCcgc3Ryb2tlLXdpZHRoPScxLjUnIG9wYWNpdHk9JzAuMTgnLz4KICA8Y2lyY2xlIGN4PSc1MDAnIGN5PScyNTAnIHI9JzgwJyBmaWxsPScjZWFiMzA4JyBvcGFjaXR5PScwLjInLz4KICA8Y2lyY2xlIGN4PSc1MDAnIGN5PScyNTAnIHI9JzM1JyBmaWxsPScjZWFiMzA4JyBvcGFjaXR5PScwLjQnLz4KICA8Y2lyY2xlIGN4PSc5MDAnIGN5PScyMDAnIHI9JzEyMCcgZmlsbD0nI2ZkZTA0Nycgb3BhY2l0eT0nMC4xMicvPgogIDx0ZXh0IHg9JzcwMCcgeT0nNDYwJyBmb250LWZhbWlseT0nR2VvcmdpYSxzZXJpZicgZm9udC1zaXplPScxOCcgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIG9wYWNpdHk9JzAuNScgbGV0dGVyLXNwYWNpbmc9JzQnPkxFQVJOSU5HPC90ZXh0Pgo8L3N2Zz4=',tags:['learning','books','memory','reading'],
+   body:`<p>I used to read a book, feel briefly intelligent, and then — within a month — be unable to recall anything beyond the vague shape of whether I liked it. I was consuming but not retaining. The books were experiences, not knowledge.</p>
+   <p>I changed the system. Here is what actually works, based on two years of deliberate experimentation.</p>
+   <blockquote>Reading without notes is tourism. You visit a place, take some photos, then come home and forget most of it. Notes are the difference between a tourist and someone who lived there.</blockquote>
+   <h2>The One Rule</h2>
+   <p>Never finish a reading session without writing at least one sentence in your own words about what you read. Not a quote — your words. What did this mean to you? How does it connect to something you already know? What question does it raise?</p>
+   <p>This one rule, applied consistently, changes reading from passive consumption to active construction. Your brain encodes the idea more deeply because it has been made to do something with it.</p>
+   <h2>The Weekly Review</h2>
+   <p>Every Sunday, I spend fifteen minutes rereading the notes I made during the week. Not to memorise them — just to encounter them again. The second encounter deepens the encoding. The third encounter, when it happens, makes the idea part of how you think rather than something you remember.</p>`},
+
+  {id:'p8',cat:'Books',pill:'pill-books',title:'The Five Books That Changed How I See Everything',exc:'Not a listicle. Five books that rewired something fundamental about how I think, and why each one did it.',date:'Feb 14, 2026',read:'10 min',img:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAwJyBoZWlnaHQ9JzUwMCc+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCUnIHkxPScwJScgeDI9JzEwMCUnIHkyPScxMDAlJz4KICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMxMDBhMWEnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9JyNhODU1ZjcnIHN0b3Atb3BhY2l0eT0nMC43Jy8+CiAgPC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9JzE0MDAnIGhlaWdodD0nNTAwJyBmaWxsPSd1cmwoI2cpJy8+CiAgCiAgPHJlY3QgeD0nMjAwJyB5PScxMDAnIHdpZHRoPScyMDAnIGhlaWdodD0nMjAwJyByeD0nOCcgZmlsbD0nI2E4NTVmNycgb3BhY2l0eT0nMC4yJyB0cmFuc2Zvcm09J3JvdGF0ZSgxNSwzMDAsMjAwKScvPgogIDxyZWN0IHg9JzQwMCcgeT0nMTUwJyB3aWR0aD0nMTYwJyBoZWlnaHQ9JzE2MCcgcng9JzgnIGZpbGw9JyNkOGI0ZmUnIG9wYWNpdHk9JzAuMjUnIHRyYW5zZm9ybT0ncm90YXRlKC04LDQ4MCwyMzApJy8+CiAgPHJlY3QgeD0nNjAwJyB5PScxMDAnIHdpZHRoPScxODAnIGhlaWdodD0nMTgwJyByeD0nOCcgZmlsbD0nI2E4NTVmNycgb3BhY2l0eT0nMC4xOCcgdHJhbnNmb3JtPSdyb3RhdGUoMjIsNjkwLDE5MCknLz4KICA8cmVjdCB4PSc5MDAnIHk9JzEzMCcgd2lkdGg9JzE0MCcgaGVpZ2h0PScxNDAnIHJ4PSc4JyBmaWxsPScjZDhiNGZlJyBvcGFjaXR5PScwLjIyJyB0cmFuc2Zvcm09J3JvdGF0ZSgtMTIsOTcwLDIwMCknLz4KICA8dGV4dCB4PSc3MDAnIHk9JzQ2MCcgZm9udC1mYW1pbHk9J0dlb3JnaWEsc2VyaWYnIGZvbnQtc2l6ZT0nMTgnIGZpbGw9J3doaXRlJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBvcGFjaXR5PScwLjUnIGxldHRlci1zcGFjaW5nPSc0Jz5CT09LUzwvdGV4dD4KPC9zdmc+',tags:['books','reading','ideas'],
+   body:`<p>There are books you enjoy and books that break you open. The second kind is rarer. When one arrives, you know it — not necessarily while reading it, but in the weeks after, when you keep noticing that you're thinking differently about things you never connected to the book at all.</p>
+   <p>Here are five that did that for me.</p>
+   <h2>1. Thinking, Fast and Slow — Daniel Kahneman</h2>
+   <p>I read this book and discovered I had been wrong about how I make decisions for my entire adult life. The degree to which our intuitions mislead us, the specific ways our minds construct shortcuts that feel like reason — this book made me permanently more humble about my own cognition.</p>
+   <h2>2. The Denial of Death — Ernest Becker</h2>
+   <p>The argument, put simply: most of what humans do is motivated by terror of our own mortality. Our careers, our relationships, our ideologies — all of them are, in part, strategies for denying or transcending the fact that we will die. Uncomfortable. Probably right.</p>
+   <blockquote>Books that confirm what you already believe are pleasant. Books that show you where you've been wrong are necessary.</blockquote>
+   <h2>3. Meditations — Marcus Aurelius</h2>
+   <p>A private journal by a Roman emperor, never intended for publication. The arguments are not original — Aurelius was synthesising Stoic philosophy he had absorbed. But the sincerity is total. A powerful man reminding himself, over and over, to be humble, to focus on what he can control, to treat others well. The gap between who he aspired to be and who he was is present on every page. That gap is relatable.</p>`},
+];
+
+const CATS = ['Technology','Life','Growth','Creative','Philosophy','Health','Learning','Books'];
+
+// ─── PAGE ROUTING ───
+let currentPage = 'home';
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-links button').forEach(b=>b.classList.remove('active'));
+  const navBtn = document.getElementById('nav'+id.charAt(0).toUpperCase()+id.slice(1));
+  if(navBtn) navBtn.classList.add('active');
+  currentPage = id;
+  window.scrollTo({top:0,behavior:'instant'});
+  if(id==='blog') renderBlogPage();
+  setTimeout(initReveals,60);
+  // nav scroll state
+  updateNavStyle();
+}
+
+function updateNavStyle(){
+  const nav = document.getElementById('nav');
+  if(currentPage==='home'){
+    nav.classList.toggle('scrolled',window.scrollY>60);
+  } else {
+    nav.classList.add('scrolled');
+  }
+}
+
+window.addEventListener('scroll',()=>{
+  updateNavStyle();
+  // reader progress
+  if(document.getElementById('readerOverlay').classList.contains('open')){
+    const el = document.getElementById('readerOverlay');
+    const pct = (el.scrollTop/(el.scrollHeight-el.clientHeight))*100;
+    document.getElementById('readerProgress').style.width=pct+'%';
+  }
+});
+
+// ─── BURGER ───
+document.getElementById('burger').addEventListener('click',()=>document.getElementById('mobMenu').classList.toggle('open'));
+function closeMob(){document.getElementById('mobMenu').classList.remove('open')}
+
+// ─── RENDER BLOG PAGE ───
+let activeTag = 'all';
+function renderBlogPage(tag){
+  if(tag) activeTag = tag;
+  const container = document.getElementById('blogPostsList');
+  const filtered = activeTag==='all' ? POSTS : POSTS.filter(p=>p.tags.includes(activeTag.toLowerCase())||p.cat===activeTag);
+  container.innerHTML = filtered.map(p=>`
+    <div class="blog-post-row" onclick="openPost('${p.id}')">
+      <div class="blog-row-img"><img src="${p.img}" alt="${p.title}" loading="lazy"/></div>
+      <div class="blog-row-body">
+        <span class="cat-pill ${p.pill}" style="position:static;display:inline-block;margin-bottom:.6rem">${p.cat}</span>
+        <h3 class="blog-row-title">${p.title}</h3>
+        <p class="blog-row-exc">${p.exc}</p>
+        <div class="blog-row-meta"><span>${p.date}</span><span style="color:var(--orange)">${p.read} read</span><span>${p.tags.map(t=>'#'+t).join(' ')}</span></div>
+      </div>
+    </div>`).join('');
+  // tag cloud
+  const tagCloud = document.getElementById('tagCloud');
+  if(tagCloud){
+    const allTags = [...new Set(POSTS.flatMap(p=>p.tags))];
+    tagCloud.innerHTML = `<button class="tag-chip ${activeTag==='all'?'active':''}" onclick="renderBlogPage('all')">All</button>`
+      + allTags.map(t=>`<button class="tag-chip ${activeTag===t?'active':''}" onclick="renderBlogPage('${t}')">#${t}</button>`).join('');
+  }
+  // popular
+  const popList = document.getElementById('popularList');
+  if(popList){
+    popList.innerHTML = POSTS.slice(0,5).map((p,i)=>`
+      <div class="popular-post" onclick="openPost('${p.id}')">
+        <span class="pop-num">0${i+1}</span>
+        <div><div class="pop-title">${p.title}</div><div class="pop-date">${p.date} &middot; ${p.read}</div></div>
+      </div>`).join('');
+  }
+}
+
+// ─── OPEN POST ───
+let currentPost = null;
+function openPost(id){
+  const p = POSTS.find(x=>x.id===id);
+  if(!p) return;
+  currentPost = p;
+  const related = POSTS.filter(x=>x.id!==id && (x.cat===p.cat || x.tags.some(t=>p.tags.includes(t)))).slice(0,2);
+  document.getElementById('readerContent').innerHTML = `
+    <span class="reader-cat">${p.cat}</span>
+    <h1 class="reader-title">${p.title}</h1>
+    <div class="reader-meta">
+      <div class="reader-author-av"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSczMDAnIGhlaWdodD0nMzAwJz4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0nZycgeDE9JzAlJyB5MT0nMCUnIHgyPScxMDAlJyB5Mj0nMTAwJSc+CiAgICAgIDxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9JyMyYTFmM2QnLz4KICAgICAgPHN0b3Agb2Zmc2V0PScxMDAlJyBzdG9wLWNvbG9yPScjNGEzYTZiJy8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0nMzAwJyBoZWlnaHQ9JzMwMCcgZmlsbD0ndXJsKCNnKScvPgogIDxlbGxpcHNlIGN4PScxNTAnIGN5PScxMzUnIHJ4PSc1Micgcnk9JzYwJyBmaWxsPScjZThkNWI4JyBvcGFjaXR5PScwLjk1Jy8+CiAgPGVsbGlwc2UgY3g9JzE1MCcgY3k9Jzk2JyByeD0nNTgnIHJ5PSczOCcgZmlsbD0nIzFhMGUwNicgb3BhY2l0eT0nMC44OCcvPgogIDxwYXRoIGQ9J003MCwyNjAgUTExMCwyMjggMTUwLDIzNCBRMTkwLDIyOCAyMzAsMjYwIEwyMzUsMzAwIEw2NSwzMDBaJyBmaWxsPScjM2EyZDVhJyBvcGFjaXR5PScwLjg1Jy8+CiAgPGVsbGlwc2UgY3g9JzEzNicgY3k9JzEzNScgcng9JzcnIHJ5PSc4JyBmaWxsPScjMmExYTA4Jy8+CiAgPGVsbGlwc2UgY3g9JzE2NCcgY3k9JzEzNScgcng9JzcnIHJ5PSc4JyBmaWxsPScjMmExYTA4Jy8+CiAgPHBhdGggZD0nTTEzNiwxNTggUTE1MCwxNzAgMTY0LDE1OCcgc3Ryb2tlPScjOGE1YTJhJyBzdHJva2Utd2lkdGg9JzIuNScgZmlsbD0nbm9uZScgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJy8+Cjwvc3ZnPg==" alt="Azzam"/></div>
+      <span>Azzam</span>
+      <div class="meta-dot"></div>
+      <span>${p.date}</span>
+      <div class="meta-dot"></div>
+      <span class="read-time">${p.read} read</span>
+    </div>
+    <img class="reader-cover" src="${p.img}" alt="${p.title}" loading="lazy"/>
+    <div class="reader-body">${p.body}</div>
+    <div class="reader-tags">${p.tags.map(t=>`<span class="tag-chip">#${t}</span>`).join('')}</div>
+    ${related.length?`<div class="related-posts">
+      <div class="sec-label">Continue reading</div>
+      <h3 style="font-family:'Playfair Display',serif;color:var(--white);margin-bottom:1.5rem">Related <em>posts</em></h3>
+      <div class="related-grid">${related.map(r=>`
+        <div class="card post-card" onclick="openPost('${r.id}')" style="background:var(--surface);border-color:var(--border)">
+          <div class="post-card-img"><img src="${r.img}" alt="" loading="lazy"/></div>
+          <div class="post-card-body">
+            <span class="post-cat">${r.cat}</span>
+            <h4 class="post-card-title" style="font-size:1.05rem">${r.title}</h4>
+            <div class="post-card-meta"><span>${r.date}</span><span class="read-time">${r.read}</span></div>
+          </div>
+        </div>`).join('')}
+      </div></div>`:''}`;
+  const ov = document.getElementById('readerOverlay');
+  ov.classList.add('open'); ov.scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+function closeReader(){
+  document.getElementById('readerOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function sharePost(){
+  if(currentPost) alert(`Share: "${currentPost.title}"\n\nURL: azzam.blog/${currentPost.id}\n(Copy this link to share!)`);
+}
+function bookmarkPost(){
+  if(currentPost){ alert(`"${currentPost.title}" bookmarked!`); }
+}
+
+// ─── FILTER AND GO ───
+function filterAndGo(cat){
+  activeTag = cat;
+  showPage('blog');
+  setTimeout(()=>renderBlogPage(cat),60);
+}
+
+// ─── SEARCH ───
+function openSearch(){
+  document.getElementById('searchOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('searchInput').focus(),50);
+}
+function closeSearch(){
+  document.getElementById('searchOverlay').classList.remove('open');
+  document.body.style.overflow='';
+  document.getElementById('searchInput').value='';
+  document.getElementById('searchResults').innerHTML='';
+}
+function runSearch(q){
+  const res = document.getElementById('searchResults');
+  if(!q.trim()){res.innerHTML='';return}
+  const matches = POSTS.filter(p=>
+    p.title.toLowerCase().includes(q.toLowerCase())||
+    p.exc.toLowerCase().includes(q.toLowerCase())||
+    p.tags.some(t=>t.toLowerCase().includes(q.toLowerCase()))||
+    p.cat.toLowerCase().includes(q.toLowerCase())
+  );
+  res.innerHTML = matches.length ? matches.map(p=>`
+    <div class="search-result-item" onclick="closeSearch();openPost('${p.id}')">
+      <div class="sr-cat">${p.cat} &nbsp;&middot;&nbsp; ${p.date}</div>
+      <div class="sr-title">${p.title}</div>
+      <div class="sr-exc">${p.exc}</div>
+    </div>`).join('')
+  : `<div style="text-align:center;color:var(--muted);font-family:'DM Mono',monospace;font-size:.8rem;padding:3rem">No posts found for "${q}"</div>`;
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeSearch();closeReader()}
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openSearch()}
+});
+
+// ─── NEWSLETTER ───
+function nlSubmit(){
+  const v=document.getElementById('nlEmail').value.trim();
+  if(!v||!/\S+@\S+\.\S+/.test(v)){alert('Please enter a valid email.');return}
+  document.getElementById('nlNote').textContent='✓  You\'re in! First issue arrives Sunday.';
+  document.getElementById('nlNote').style.color='var(--green)';
+  document.getElementById('nlEmail').value='';
+}
+function sideNlSubmit(){
+  const v=document.getElementById('sideNlEmail').value.trim();
+  if(!v||!/\S+@\S+\.\S+/.test(v)){alert('Please enter a valid email.');return}
+  alert('Subscribed! See you Sunday.');
+  document.getElementById('sideNlEmail').value='';
+}
+
+// ─── CONTACT ───
+function submitContact(){
+  const fn=document.getElementById('cfn').value.trim();
+  const em=document.getElementById('cem').value.trim();
+  const msg=document.getElementById('cmsg').value.trim();
+  if(!fn||!em||!msg){alert('Please fill in required fields.');return}
+  if(!/\S+@\S+\.\S+/.test(em)){alert('Please enter a valid email.');return}
+  const s=document.getElementById('contactSuccess');
+  s.style.display='block';
+  ['cfn','cln','cem','cmsg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  document.getElementById('csub').selectedIndex=0;
+  setTimeout(()=>s.style.display='none',6000);
+}
+
+// ─── REVEAL OBSERVER ───
+function initReveals(){
+  const ro = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');ro.unobserve(e.target)}});
+  },{threshold:0.08});
+  document.querySelectorAll('.reveal:not(.vis)').forEach(el=>ro.observe(el));
+}
+initReveals();
+
+// ─── CURSOR GLOW ───
+document.addEventListener('mousemove',e=>{
+  const g=document.getElementById('cursorGlow');
+  g.style.left=e.clientX+'px';
+  g.style.top=e.clientY+'px';
+});
+
+// ─── INJECT FOOTER INTO PAGES ───
+const footerHTML = document.getElementById('footerTpl').innerHTML;
+document.querySelectorAll('.page').forEach(pg=>{
+  const marker = pg.innerHTML.indexOf('FOOTER_BLOCK');
+  if(marker>-1) pg.innerHTML = pg.innerHTML.replace('FOOTER_BLOCK',footerHTML);
+});
+
+// init
+showPage('home');
+</script>
+</body>
+</html>
